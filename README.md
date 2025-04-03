@@ -24,7 +24,7 @@ Special thanks to **Ph.D. Professor Isidro** for his guidance and support throug
 
 1. **Clone the repository:**
 ```bash
-  git clone <repository-url>
+  git clone https://github.com/DiogoJunqueiraGeraldo/events-management-api.git
 ```
 
 2. **Build the project:**
