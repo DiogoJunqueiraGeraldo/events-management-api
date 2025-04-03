@@ -108,7 +108,7 @@ public class Event {
     }
 
     private void setPrice(BigDecimal price) {
-        if (BigDecimal.ZERO.compareTo(price) < 0) {
+        if (BigDecimal.ZERO.compareTo(price) > 0) {
             throw new IllegalArgumentException("Event 'price' should not be negative");
         }
 
