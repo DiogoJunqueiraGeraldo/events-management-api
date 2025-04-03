@@ -10,9 +10,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.math.BigInteger;
-import java.util.Objects;
-
 @RestController
 public class EventsController {
     private final CreateEventUseCase createEventUseCase;

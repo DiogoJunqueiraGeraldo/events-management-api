@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicLong;
 @Repository
 public class InMemoryEventRepository implements EventRepository {
     private static final AtomicLong eventIdSequence = new AtomicLong(0);
-    private static final ConcurrentHashMap<Long, EventRecord> storage = new ConcurrentHashMap();
+    private static final ConcurrentHashMap<Long, EventRecord> storage = new ConcurrentHashMap<>();
 
     private Long generateIdIfAbsent(Event event) {
         return (event.getId() != null) ? event.getId() : eventIdSequence.getAndAdd(1);

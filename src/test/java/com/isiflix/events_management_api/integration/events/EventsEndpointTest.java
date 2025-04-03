@@ -16,7 +16,6 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -104,7 +103,7 @@ public class EventsEndpointTest {
     @Test
     @DisplayName("Integration Test - Invalid event - Incoherent fields")
     public void shouldValidateFieldsCoherence() throws Exception {
-        final var yesterday = OffsetDateTime.now().minus(1, ChronoUnit.DAYS).toLocalDate();
+        final var yesterday = OffsetDateTime.now().minusDays(1).toLocalDate();
         final var event = new CreateEventRequest(
                 "",
                 "",
