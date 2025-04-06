@@ -3,6 +3,9 @@ package com.isiflix.events_management_api.integration.events;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.isiflix.events_management_api.app.errors.ErrorResponse;
 import com.isiflix.events_management_api.app.events.controllers.CreateEventRequest;
+import com.isiflix.events_management_api.app.events.dtos.EventDTO;
+import com.isiflix.events_management_api.domain.errors.ViolationCode;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,13 +22,12 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class EventsEndpointTest {
+public class CreateEventIntegrationTest {
     private final MockMvc mockMvc;
     private final ObjectMapper objectMapper;
 
@@ -33,7 +35,7 @@ public class EventsEndpointTest {
     private static final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 
     @Autowired
-    public EventsEndpointTest(MockMvc mockMvc, ObjectMapper objectMapper) {
+    public CreateEventIntegrationTest(MockMvc mockMvc, ObjectMapper objectMapper) {
         this.mockMvc = mockMvc;
         this.objectMapper = objectMapper;
     }
@@ -44,7 +46,7 @@ public class EventsEndpointTest {
         final var tomorrow = LocalDate.now().plusDays(1);
         final var forFree = BigDecimal.ZERO;
 
-        final var event = new CreateEventRequest(
+        final var createEventRequest = new CreateEventRequest(
                 "Saturday IsiFlix Live Coding!",
                 "online",
                 forFree,
@@ -54,27 +56,65 @@ public class EventsEndpointTest {
                 LocalTime.of(18, 0)
         );
 
-        final var expectedStartDate = event.startDate().format(dateFormatter);
-        final var expectedEndDate = event.endDate().format(dateFormatter);
-        final var expectedStartTime = event.startTime().format(timeFormatter);
-        final var expectedEndTime = event.endTime().format(timeFormatter);
-
-        final var payload = objectMapper.writeValueAsString(event);
+        final var payload = objectMapper.writeValueAsString(createEventRequest);
         final var request = post("/events")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(payload);
 
-        this.mockMvc.perform(request)
+        final var responseBody = mockMvc.perform(request)
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").isNumber())
-                .andExpect(jsonPath("$.name").value(event.name()))
-                .andExpect(jsonPath("$.prettyName").isString())
-                .andExpect(jsonPath("$.location").value(event.location()))
-                .andExpect(jsonPath("$.price").value(event.price()))
-                .andExpect(jsonPath("$.startDate").value(expectedStartDate))
-                .andExpect(jsonPath("$.endDate").value(expectedEndDate))
-                .andExpect(jsonPath("$.startTime").value(expectedStartTime))
-                .andExpect(jsonPath("$.endTime").value(expectedEndTime));
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        final var response = objectMapper.readValue(responseBody, EventDTO.class);
+
+        Assertions.assertNotNull(response.id());
+        Assertions.assertEquals(createEventRequest.name(), response.name());
+        Assertions.assertEquals(createEventRequest.price(), response.price());
+        Assertions.assertEquals(createEventRequest.location(), response.location());
+        Assertions.assertEquals(createEventRequest.startDate(), response.startDate());
+        Assertions.assertEquals(createEventRequest.endDate(), response.endDate());
+        Assertions.assertEquals(createEventRequest.startTime(), response.startTime());
+        Assertions.assertEquals(createEventRequest.endTime(), response.endTime());
+    }
+
+    @Test
+    @DisplayName("Integration Test - Conflict - Pretty name already exists")
+    public void shouldReturnConflict() throws Exception {
+        final var tomorrow = LocalDate.now().plusDays(1);
+        final var forFree = BigDecimal.ZERO;
+        final var createEventRequest = new CreateEventRequest(
+                "Conflicting Pretty Name",
+                "online",
+                forFree,
+                tomorrow,
+                tomorrow,
+                LocalTime.of(8, 0),
+                LocalTime.of(18, 0)
+        );
+
+        final var payload = objectMapper.writeValueAsString(createEventRequest);
+        final var request = post("/events")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(payload);
+
+        mockMvc.perform(request)
+                .andExpect(status().isCreated());
+
+        final var responseBody = mockMvc.perform(request)
+                .andExpect(status().isConflict())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        final var response = objectMapper.readValue(responseBody, ErrorResponse.class);
+
+        final var violationCode = ViolationCode.of(response.code());
+        Assertions.assertTrue(violationCode.isPresent());
+        Assertions.assertEquals(ViolationCode.CONFLICT_PRETTY_NAME_ALREADY_EXISTS, violationCode.get());
+        Assertions.assertNotNull(response.message());
+        Assertions.assertFalse(response.message().isBlank());
     }
 
     @Test
@@ -103,13 +143,14 @@ public class EventsEndpointTest {
     @Test
     @DisplayName("Integration Test - Invalid event - Incoherent fields")
     public void shouldValidateFieldsCoherence() throws Exception {
+        final var beforeYesterday = OffsetDateTime.now().minusDays(2).toLocalDate();
         final var yesterday = OffsetDateTime.now().minusDays(1).toLocalDate();
         final var event = new CreateEventRequest(
                 "",
                 "",
                 BigDecimal.valueOf(-100.00),
                 yesterday,
-                yesterday,
+                beforeYesterday,
                 LocalTime.of(8, 0),
                 LocalTime.of(18, 0)
         );

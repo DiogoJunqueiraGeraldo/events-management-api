@@ -1,4 +1,4 @@
-package com.isiflix.events_management_api.infra.config;
+package com.isiflix.events_management_api.app.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;

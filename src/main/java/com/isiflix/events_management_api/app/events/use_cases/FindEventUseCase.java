@@ -1,25 +1,23 @@
 package com.isiflix.events_management_api.app.events.use_cases;
 
-import com.isiflix.events_management_api.app.events.dtos.CreateEventDTO;
 import com.isiflix.events_management_api.app.events.dtos.EventDTO;
-import com.isiflix.events_management_api.domain.events.EventFactory;
 import com.isiflix.events_management_api.domain.events.EventRepository;
 import com.isiflix.events_management_api.domain.events.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
-public class CreateEventUseCase {
+public class FindEventUseCase {
     private final EventService eventService;
 
     @Autowired
-    public CreateEventUseCase(EventRepository eventRepository) {
+    public FindEventUseCase(EventRepository eventRepository) {
         this.eventService = new EventService(eventRepository);
     }
 
-    public EventDTO createNewEvent(CreateEventDTO createNewEvent) {
-        final var event = EventFactory.create(createNewEvent);
-        eventService.save(event);
-        return event.toDTO();
+    public Optional<EventDTO> find(String prettyName) {
+        return eventService.findByPrettyName(prettyName);
     }
 }

@@ -12,7 +12,9 @@ public record PrettyNameVO(String prettyName) {
     }
 
     private static String normalize(String name) {
-        return name.replaceAll(" ", "-").toLowerCase();
+        return name.replaceAll(" ", "-")
+                .replaceAll("[^a-zA-Z0-9 -]", "")
+                .toLowerCase();
     }
 
     private void validateRequirements() {
@@ -22,7 +24,7 @@ public record PrettyNameVO(String prettyName) {
     }
 
     private void validateCohesion() {
-        if (prettyName.contains(" ") || !prettyName.toLowerCase().equals(prettyName)) {
+        if (prettyName == null || prettyName.isBlank() || !normalize(prettyName).equals(prettyName)) {
             throw new IllegalArgumentException("Event 'prettyName' provided doesn't fit pretty name normative");
         }
     }

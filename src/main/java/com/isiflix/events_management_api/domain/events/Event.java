@@ -16,9 +16,9 @@ public class Event {
 
     /**
      * New Instance Constructor
-     *
+     * <p>
      * It should be used to create a new event instance, when it doesn't exist on the storage yet
-     *
+     * </p>
      * @param name event name, it will be used to generate the pretty name
      * @param location event location, where the event will be placed
      * @param price event price, it can be for free, but don't try to get smart about it
@@ -26,16 +26,18 @@ public class Event {
      */
     protected Event(String name, String location, BigDecimal price, EventPeriodVO period) {
         setName(name);
-        setPrettyName();
         setLocation(location);
         setPrice(price);
         setPeriod(period);
+
+        generatePrettyNameFromName();
     }
 
     /**
      * Deserialization Instance Constructor
-     *
+     * <p>
      * It should be used to create an existing instance, when it's been validated already
+     * </p>
      *
      * @param id event unique identifier
      * @param name event name, stored on the database
@@ -45,20 +47,20 @@ public class Event {
      * @param period event period, stored on the database
      */
     protected Event(Long id, String name, PrettyNameVO prettyName, String location, BigDecimal price, EventPeriodVO period) {
-        this.id = id;
+        setId(id);
         setName(name);
-        this.prettyName = prettyName;
-        this.location = location;
-        this.price = price;
-        this.period = period;
+        setPrettyName(prettyName);
+        setLocation(location);
+        setPrice(price);
+        setPeriod(period);
     }
 
 
     /**
      * Serialization DTO Factory
-     *
+     * <p>
      * The Event entity it's inheriting the responsibility of creating the dto, to avoid exposing internal fields
-     *
+     * </p>
      * @return event data transfer object, specialized for serialization
      */
     public EventDTO toDTO() {
@@ -75,15 +77,23 @@ public class Event {
         );
     }
 
-    public Long getId() {
-        return this.id;
-    }
-
     protected void setId(Long id) {
+        if(id == null || id < 0) {
+            throw new IllegalArgumentException("Event 'id' cannot be null or negative");
+        }
+
         this.id = id;
     }
 
-    private void setPrettyName() {
+    private void setPrettyName(PrettyNameVO prettyName) {
+        if(prettyName == null) {
+            throw new IllegalArgumentException("Event 'prettyName' cannot be null");
+        }
+
+        this.prettyName = prettyName;
+    }
+
+    private void generatePrettyNameFromName() {
         if (name == null || name.isBlank()) {
             throw new IllegalArgumentException("Event 'name' should not be null or blank");
         }
@@ -122,4 +132,7 @@ public class Event {
 
         this.period = period;
     }
+
+    public Long getId() { return this.id; }
+    public PrettyNameVO getPrettyName() { return this.prettyName; }
 }

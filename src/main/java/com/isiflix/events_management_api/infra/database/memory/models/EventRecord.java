@@ -1,6 +1,8 @@
 package com.isiflix.events_management_api.infra.database.memory.models;
 
 import com.isiflix.events_management_api.app.events.dtos.EventDTO;
+import com.isiflix.events_management_api.domain.events.Event;
+import com.isiflix.events_management_api.domain.events.EventFactory;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -28,6 +30,20 @@ public record EventRecord(
                 eventDTO.endDate(),
                 eventDTO.startTime(),
                 eventDTO.endTime()
+        );
+    }
+
+    public Event toEntity() {
+        return EventFactory.fromRaw(
+                this.id,
+                this.name,
+                this.prettyName,
+                this.location,
+                this.price,
+                this.startDate,
+                this.endDate,
+                this.startTime,
+                this.endTime
         );
     }
 }
