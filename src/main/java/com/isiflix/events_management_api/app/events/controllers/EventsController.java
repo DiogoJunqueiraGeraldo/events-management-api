@@ -34,8 +34,7 @@ public class EventsController {
     @ResponseStatus(HttpStatus.CREATED)
     public EventDTO createNewEvent(@Valid @RequestBody CreateEventRequest createEventRequest) {
         final var createEventDTO = CreateEventDTO.of(createEventRequest);
-        final EventDTO event = createEventUseCase.createNewEvent(createEventDTO);
-        return event;
+        return createEventUseCase.createNewEvent(createEventDTO);
     }
 
     @GetMapping("/events")

@@ -30,7 +30,7 @@ public class InMemoryEventRepository implements EventRepository {
 
     @Override
     public List<Event> list(int page, int size) {
-        long skip = (page - 1l) * size;
+        long skip = (page - 1L) * size;
 
         return storage.values()
                 .stream()

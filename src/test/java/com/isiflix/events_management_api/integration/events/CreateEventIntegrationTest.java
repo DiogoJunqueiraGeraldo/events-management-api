@@ -18,7 +18,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -30,9 +29,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class CreateEventIntegrationTest {
     private final MockMvc mockMvc;
     private final ObjectMapper objectMapper;
-
-    private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    private static final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 
     @Autowired
     public CreateEventIntegrationTest(MockMvc mockMvc, ObjectMapper objectMapper) {

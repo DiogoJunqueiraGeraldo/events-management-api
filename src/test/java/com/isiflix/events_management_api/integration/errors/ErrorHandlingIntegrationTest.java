@@ -40,15 +40,13 @@ public class ErrorHandlingIntegrationTest {
         });
     }
 
-    private void assertErrorResponseWithIssues(String responseBody, String errorCode, List<String> issues) {
+    private void assertInvalidParameters(String responseBody, List<String> issues) {
         Assertions.assertDoesNotThrow(() -> {
             final var error = objectMapper.readValue(responseBody, ErrorResponse.class);
-            assertEquals(errorCode, error.code());
+            assertEquals("invalid-parameters", error.code());
             assertTrue(OffsetDateTime.now().isAfter(error.moment()));
             assertFalse(error.message().isBlank());
-            issues.forEach(issueName -> {
-                Assertions.assertTrue(error.issues().containsKey(issueName));
-            });
+            issues.forEach(issueName -> Assertions.assertTrue(error.issues().containsKey(issueName)));
         });
     }
 
@@ -79,9 +77,10 @@ public class ErrorHandlingIntegrationTest {
     @Test
     @DisplayName("Integration Test - Existing route but unreadable body")
     public void shouldReturnUnprocessableEntityForNotReadableBody() throws Exception {
+        final var invalidJson = "{";
         final var request = post("/events")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{");
+                .content(invalidJson);
 
         final var responseBody = mockMvc.perform(request)
                 .andExpect(status().isUnprocessableEntity())
@@ -106,9 +105,8 @@ public class ErrorHandlingIntegrationTest {
                 .getResponse()
                 .getContentAsString();
 
-        assertErrorResponseWithIssues(
+        assertInvalidParameters(
                 responseBody,
-                "invalid-parameters",
                 List.of("page", "size")
         );
     }
@@ -127,9 +125,8 @@ public class ErrorHandlingIntegrationTest {
                 .getResponse()
                 .getContentAsString();
 
-        assertErrorResponseWithIssues(
+        assertInvalidParameters(
                 responseBody,
-                "invalid-parameters",
                 // short circuit at the first exception
                 List.of("page")
         );
