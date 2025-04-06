@@ -21,11 +21,11 @@ import net.logstash.logback.argument.StructuredArguments;
 import java.util.*;
 
 @RestControllerAdvice
-public class ErrorController {
-    private static final Logger logger = LoggerFactory.getLogger(ErrorController.class);
+public class GlobalExceptionHandler {
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
     private final StatusCodeMapper statusCodeMapper;
 
-    public ErrorController() {
+    public GlobalExceptionHandler() {
         this.statusCodeMapper = new StatusCodeMapper();
     }
 
@@ -37,7 +37,9 @@ public class ErrorController {
         logger.error("Business Rule Violation Exception Occurred",
                 StructuredArguments.keyValue("code", violationCode.toString()),
                 StructuredArguments.keyValue("message", e.getMessage()),
-                StructuredArguments.keyValue("metadata", metadata));
+                StructuredArguments.keyValue("metadata", metadata),
+                StructuredArguments.keyValue("stackTrace", e.getStackTrace())
+        );
 
         final int statusCode = this.statusCodeMapper.of(violationCode);
         return ResponseEntity
@@ -121,7 +123,7 @@ public class ErrorController {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
     public ErrorResponse handleUnexpectedException(Exception e) {
-        logger.warn("An unexpected error occurred", e);
+        logger.error("An unexpected error occurred", StructuredArguments.keyValue("stackTrace", e.getStackTrace()));
         return new ErrorResponse("unexpected-error", "An unexpected error occurred", null);
     }
 }

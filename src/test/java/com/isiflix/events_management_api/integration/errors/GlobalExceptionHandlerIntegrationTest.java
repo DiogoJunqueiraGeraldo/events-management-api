@@ -2,6 +2,8 @@ package com.isiflix.events_management_api.integration.errors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.isiflix.events_management_api.app.errors.ErrorResponse;
+import com.isiflix.events_management_api.app.errors.GlobalExceptionHandler;
+import nl.altindag.log.LogCaptor;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,12 +22,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class ErrorHandlingIntegrationTest {
+public class GlobalExceptionHandlerIntegrationTest {
     private final MockMvc mockMvc;
     private final ObjectMapper objectMapper;
 
     @Autowired
-    public ErrorHandlingIntegrationTest(MockMvc mockMvc, ObjectMapper objectMapper) {
+    public GlobalExceptionHandlerIntegrationTest(MockMvc mockMvc, ObjectMapper objectMapper) {
         this.mockMvc = mockMvc;
         this.objectMapper = objectMapper;
     }
@@ -48,6 +50,23 @@ public class ErrorHandlingIntegrationTest {
             assertFalse(error.message().isBlank());
             issues.forEach(issueName -> Assertions.assertTrue(error.issues().containsKey(issueName)));
         });
+    }
+
+    @Test
+    @DisplayName("Integration Test - Unexpected Failure - Log Level")
+    public void shouldLogErrorLevelLogsForUnexpectedFailure() throws Exception {
+        try(final LogCaptor logCaptor = LogCaptor.forClass(GlobalExceptionHandler.class)) {
+            final var responseBody = mockMvc.perform(get("/tests/simulate/unexpected-failure"))
+                    .andExpect(status().isInternalServerError())
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            final var response = objectMapper.readValue(responseBody, ErrorResponse.class);
+            Assertions.assertEquals("unexpected-error",response.code());
+            Assertions.assertFalse(response.message().isBlank());
+            Assertions.assertEquals(1, logCaptor.getErrorLogs().size());
+        }
     }
 
     @Test
