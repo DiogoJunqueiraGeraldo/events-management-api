@@ -1,7 +1,7 @@
 package com.isiflix.events_management_api.integration.errors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.isiflix.events_management_api.app.errors.ErrorResponse;
+import com.isiflix.events_management_api.app.errors.StandardErrorResponse;
 import com.isiflix.events_management_api.app.errors.GlobalExceptionHandler;
 import nl.altindag.log.LogCaptor;
 import org.junit.jupiter.api.Assertions;
@@ -34,7 +34,7 @@ public class GlobalExceptionHandlerIntegrationTest {
 
     private void assertErrorResponseWithoutIssues(String responseBody, String errorCode) {
         Assertions.assertDoesNotThrow(() -> {
-            final var error = objectMapper.readValue(responseBody, ErrorResponse.class);
+            final var error = objectMapper.readValue(responseBody, StandardErrorResponse.class);
             assertEquals(errorCode, error.code());
             assertTrue(OffsetDateTime.now().isAfter(error.moment()));
             assertFalse(error.message().isBlank());
@@ -44,7 +44,7 @@ public class GlobalExceptionHandlerIntegrationTest {
 
     private void assertInvalidParameters(String responseBody, List<String> issues) {
         Assertions.assertDoesNotThrow(() -> {
-            final var error = objectMapper.readValue(responseBody, ErrorResponse.class);
+            final var error = objectMapper.readValue(responseBody, StandardErrorResponse.class);
             assertEquals("invalid-parameters", error.code());
             assertTrue(OffsetDateTime.now().isAfter(error.moment()));
             assertFalse(error.message().isBlank());
@@ -62,7 +62,7 @@ public class GlobalExceptionHandlerIntegrationTest {
                     .getResponse()
                     .getContentAsString();
 
-            final var response = objectMapper.readValue(responseBody, ErrorResponse.class);
+            final var response = objectMapper.readValue(responseBody, StandardErrorResponse.class);
             Assertions.assertEquals("unexpected-error",response.code());
             Assertions.assertFalse(response.message().isBlank());
             Assertions.assertEquals(1, logCaptor.getErrorLogs().size());

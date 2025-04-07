@@ -1,0 +1,19 @@
+version: '3.9'
+
+services:
+
+  db:
+    image: postgres
+    restart: always
+    shm_size: 128mb
+    volumes:
+      - type: tmpfs
+        target: /dev/shm
+        tmpfs:
+          size: 134217728 # 128Mb
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: events
+    ports:
+      - "5432:5432"

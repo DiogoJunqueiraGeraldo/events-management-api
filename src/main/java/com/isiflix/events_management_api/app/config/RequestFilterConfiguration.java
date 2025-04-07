@@ -11,7 +11,7 @@ import org.springframework.http.HttpStatus;
 import java.io.IOException;
 
 @Configuration
-public class TrailingSlashRedirectConfiguration {
+public class RequestFilterConfiguration {
     @Bean
     public FilterRegistrationBean<Filter> trailingSlashRedirectFilter() {
         FilterRegistrationBean<Filter> registrationBean = new FilterRegistrationBean<>();
@@ -32,8 +32,8 @@ public class TrailingSlashRedirectConfiguration {
                 String requestURI = req.getRequestURI();
 
                 boolean isNotRootPath = requestURI.length() > 1;
-                boolean isTrailingSlash = requestURI.endsWith("/");
-                if (isNotRootPath && isTrailingSlash) {
+                boolean hasTrailingSlash = requestURI.endsWith("/");
+                if (isNotRootPath && hasTrailingSlash) {
                     String matchAnyAmountOfTrailingSlashes = "/+$";
                     String sanitizedURI = requestURI.replaceAll(matchAnyAmountOfTrailingSlashes, "");
 

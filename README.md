@@ -31,8 +31,8 @@ of this size — but exploring them would be a great way to dive into small yet 
 ### Logging & Observability
 - [x] Structured logging (JSON format)
 - [ ] MDC (`requestId`, `userId`, `correlationId`)
-- [ ] Exception handling with stacktrace logged
-- [ ] Centralized error format (`code`, `message`, `timestamp`, etc.)
+- [x] Exception handling with stacktrace logged
+- [x] Centralized error format (`code`, `message`, `issues`, etc.)
 
 ### Metrics & Tracing
 - [ ] Micrometer metrics exported (e.g., Prometheus)
@@ -47,24 +47,23 @@ of this size — but exploring them would be a great way to dive into small yet 
 - [ ] Graceful shutdown (SIGTERM handling)
 
 ### Configuration & Secrets
-- [ ] No hardcoded values
-- [ ] External config via profiles (`application.yml`, `application-prod.yml`)
+- [x] No hardcoded values
+- [x] External config via profiles (`application.yml`, `application-prod.yml`)
 - [ ] Secrets via environment variables or secret manager
 
 ### Security Basics
-- [ ] HTTPS enforced
 - [ ] Authentication implemented (JWT, OAuth2, etc.)
-- [ ] No sensitive info exposed in error responses
+- [x] No sensitive info exposed in error responses
 
 ### Infrastructure & Packaging
 - [ ] Dockerfile using lightweight base image
-- [ ] Build is reproducible (e.g., via Maven wrapper)
+- [x] Build is reproducible (e.g., via Maven wrapper)
 - [ ] Readiness and liveness probes for orchestration
 - [ ] Container shuts down gracefully
 
 ### Data & Persistence
-- [ ] Schema migrations via Flyway or Liquibase
-- [ ] Migrations are versioned and idempotent
+- [x] Schema migrations via Flyway or Liquibase
+- [x] Migrations are versioned and idempotent
 
 ---
 

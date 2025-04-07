@@ -8,17 +8,17 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 
-public record ErrorResponse(
+public record StandardErrorResponse(
         String code,
         String message,
         OffsetDateTime moment,
         @JsonInclude(Include.NON_NULL) Map<String, List<String>> issues
 ) {
-    ErrorResponse(String code, String message, Map<String, List<String>> issues) {
+    StandardErrorResponse(String code, String message, Map<String, List<String>> issues) {
         this(code, message, OffsetDateTime.now(), issues);
     }
 
-    public static ErrorResponse of(BusinessRuleViolationException e) {
-        return new ErrorResponse(e.getViolationCode().toString(), e.getMessage(), null);
+    public static StandardErrorResponse of(BusinessRuleViolationException e) {
+        return new StandardErrorResponse(e.getViolationCode().toString(), e.getMessage(), null);
     }
 }

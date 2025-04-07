@@ -30,7 +30,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(BusinessRuleViolationException.class)
-    public ResponseEntity<ErrorResponse> handleBusinessRuleViolationException(BusinessRuleViolationException e) {
+    public ResponseEntity<StandardErrorResponse> handleBusinessRuleViolationException(BusinessRuleViolationException e) {
         final var violationCode = e.getViolationCode();
         final var metadata = Optional.ofNullable(e.getMetadata()).orElse(Collections.emptyMap());
 
@@ -44,12 +44,12 @@ public class GlobalExceptionHandler {
         final int statusCode = this.statusCodeMapper.of(violationCode);
         return ResponseEntity
                 .status(statusCode)
-                .body(ErrorResponse.of(e));
+                .body(StandardErrorResponse.of(e));
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ErrorResponse handleValidationExceptions(
+    public StandardErrorResponse handleValidationExceptions(
             MethodArgumentNotValidException ex) {
         final Map<String, List<String>> errors = new HashMap<>();
 
@@ -61,12 +61,12 @@ public class GlobalExceptionHandler {
             fieldErrors.add(errorMessage);
         });
 
-        return new ErrorResponse("invalid-payload", "Invalid Payload", errors);
+        return new StandardErrorResponse("invalid-payload", "Invalid Payload", errors);
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(HandlerMethodValidationException.class)
-    public ErrorResponse handleValidationExceptions(
+    public StandardErrorResponse handleValidationExceptions(
             HandlerMethodValidationException ex) {
         final Map<String, List<String>> errors = new HashMap<>();
 
@@ -79,31 +79,31 @@ public class GlobalExceptionHandler {
             errors.put(parameterName, errorMessage);
         });
 
-        return new ErrorResponse("invalid-parameters", "Invalid Parameters", errors);
+        return new StandardErrorResponse("invalid-parameters", "Invalid Parameters", errors);
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ErrorResponse handleValidationExceptions(
+    public StandardErrorResponse handleValidationExceptions(
             MethodArgumentTypeMismatchException ex) {
         final Map<String, List<String>> errors = new HashMap<>();
 
         final var parameterName = ex.getPropertyName();
         errors.put(parameterName, List.of(ex.getMessage()));
 
-        return new ErrorResponse("invalid-parameters", "Invalid Parameters", errors);
+        return new StandardErrorResponse("invalid-parameters", "Invalid Parameters", errors);
     }
 
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ErrorResponse handleNotReadable() {
-        return new ErrorResponse("not-readable-payload", "Payload not readable", null);
+    public StandardErrorResponse handleNotReadable() {
+        return new StandardErrorResponse("not-readable-payload", "Payload not readable", null);
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(NoResourceFoundException.class)
-    public ErrorResponse handleNotFound(NoResourceFoundException ex) {
-        return new ErrorResponse(
+    public StandardErrorResponse handleNotFound(NoResourceFoundException ex) {
+        return new StandardErrorResponse(
                 "not-found",
                 "The request resource %s was not found".formatted(ex.getResourcePath()),
                 null
@@ -112,8 +112,8 @@ public class GlobalExceptionHandler {
 
     @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    public ErrorResponse handleNotAllowedMethod(HttpRequestMethodNotSupportedException ex) {
-        return new ErrorResponse(
+    public StandardErrorResponse handleNotAllowedMethod(HttpRequestMethodNotSupportedException ex) {
+        return new StandardErrorResponse(
                 "method-not-allowed",
                 "The request method %s is not allowed".formatted(ex.getMethod()),
                 null
@@ -122,8 +122,8 @@ public class GlobalExceptionHandler {
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
-    public ErrorResponse handleUnexpectedException(Exception e) {
+    public StandardErrorResponse handleUnexpectedException(Exception e) {
         logger.error("An unexpected error occurred", StructuredArguments.keyValue("stackTrace", e.getStackTrace()));
-        return new ErrorResponse("unexpected-error", "An unexpected error occurred", null);
+        return new StandardErrorResponse("unexpected-error", "An unexpected error occurred", null);
     }
 }

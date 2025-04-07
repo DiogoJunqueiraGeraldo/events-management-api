@@ -1,9 +1,10 @@
 package com.isiflix.events_management_api.integration.events;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.isiflix.events_management_api.app.errors.ErrorResponse;
+import com.isiflix.events_management_api.app.errors.StandardErrorResponse;
 import com.isiflix.events_management_api.app.events.controllers.CreateEventRequest;
 import com.isiflix.events_management_api.app.events.dtos.EventDTO;
+import com.isiflix.events_management_api.infra.database.event.JPAEventRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -26,14 +27,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class FindEventIntegrationTest {
     private final MockMvc mockMvc;
     private final ObjectMapper objectMapper;
+    private final JPAEventRepository jpaEventRepository;
 
     private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 
     @Autowired
-    public FindEventIntegrationTest(MockMvc mockMvc, ObjectMapper objectMapper) {
+    public FindEventIntegrationTest(MockMvc mockMvc, ObjectMapper objectMapper, JPAEventRepository jpaEventRepository) {
         this.mockMvc = mockMvc;
         this.objectMapper = objectMapper;
+        this.jpaEventRepository = jpaEventRepository;
+    }
+
+    @BeforeEach
+    void setUp() {
+        this.jpaEventRepository.deleteAll();
     }
 
     @Test
@@ -78,7 +86,7 @@ public class FindEventIntegrationTest {
         Assertions.assertNotNull(response.id());
         Assertions.assertEquals(createEventRequest.name(), response.name());
         Assertions.assertEquals(expectedPrettyName, response.prettyName());
-        Assertions.assertEquals(createEventRequest.price(), response.price());
+        Assertions.assertEquals(createEventRequest.price().doubleValue(), response.price().doubleValue());
         Assertions.assertEquals(createEventRequest.location(), response.location());
         Assertions.assertEquals(createEventRequest.startDate(), response.startDate());
         Assertions.assertEquals(createEventRequest.endDate(), response.endDate());
@@ -96,7 +104,7 @@ public class FindEventIntegrationTest {
                 .getResponse()
                 .getContentAsString();
 
-        final var response = objectMapper.readValue(responseBody, ErrorResponse.class);
+        final var response = objectMapper.readValue(responseBody, StandardErrorResponse.class);
         Assertions.assertEquals("not-found", response.code());
         Assertions.assertNotNull(response.message());
         Assertions.assertFalse(response.message().isBlank());

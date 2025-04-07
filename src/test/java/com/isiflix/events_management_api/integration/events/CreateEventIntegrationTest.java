@@ -1,11 +1,13 @@
 package com.isiflix.events_management_api.integration.events;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.isiflix.events_management_api.app.errors.ErrorResponse;
+import com.isiflix.events_management_api.app.errors.StandardErrorResponse;
 import com.isiflix.events_management_api.app.events.controllers.CreateEventRequest;
 import com.isiflix.events_management_api.app.events.dtos.EventDTO;
 import com.isiflix.events_management_api.domain.errors.ViolationCode;
+import com.isiflix.events_management_api.infra.database.event.JPAEventRepository;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,11 +31,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class CreateEventIntegrationTest {
     private final MockMvc mockMvc;
     private final ObjectMapper objectMapper;
+    private final JPAEventRepository jpaEventRepository;
 
     @Autowired
-    public CreateEventIntegrationTest(MockMvc mockMvc, ObjectMapper objectMapper) {
+    public CreateEventIntegrationTest(MockMvc mockMvc, ObjectMapper objectMapper, JPAEventRepository jpaEventRepository) {
         this.mockMvc = mockMvc;
         this.objectMapper = objectMapper;
+        this.jpaEventRepository = jpaEventRepository;
+    }
+
+    @BeforeEach
+    void setUp() {
+        this.jpaEventRepository.deleteAll();
     }
 
     @Test
@@ -104,7 +113,7 @@ public class CreateEventIntegrationTest {
                 .getResponse()
                 .getContentAsString();
 
-        final var response = objectMapper.readValue(responseBody, ErrorResponse.class);
+        final var response = objectMapper.readValue(responseBody, StandardErrorResponse.class);
 
         final var violationCode = ViolationCode.of(response.code());
         Assertions.assertTrue(violationCode.isPresent());
@@ -126,7 +135,7 @@ public class CreateEventIntegrationTest {
                 .getResponse()
                 .getContentAsString();
 
-        final var error = objectMapper.readValue(responseBody, ErrorResponse.class);
+        final var error = objectMapper.readValue(responseBody, StandardErrorResponse.class);
 
         assertEquals("invalid-payload", error.code());
         assertTrue(OffsetDateTime.now().isAfter(error.moment()));
@@ -162,7 +171,7 @@ public class CreateEventIntegrationTest {
                 .getResponse()
                 .getContentAsString();
 
-        final var error = objectMapper.readValue(responseBody, ErrorResponse.class);
+        final var error = objectMapper.readValue(responseBody, StandardErrorResponse.class);
 
         assertEquals("invalid-payload", error.code());
         assertTrue(OffsetDateTime.now().isAfter(error.moment()));

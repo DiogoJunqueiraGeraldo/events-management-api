@@ -5,8 +5,7 @@ import com.isiflix.events_management_api.domain.events.vos.EventPeriodVO;
 import com.isiflix.events_management_api.domain.events.vos.PrettyNameVO;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 
 public class EventFactory {
     /**
@@ -44,10 +43,8 @@ public class EventFactory {
      * @param prettyName the human-friendly event name.
      * @param location   the event location.
      * @param price      the event price.
-     * @param startDate  the event start date.
-     * @param endDate    the event end date.
-     * @param startTime  the event start time.
-     * @param endTime    the event end time.
+     * @param startDateTime  the event start date and time.
+     * @param endDateTime    the event end date and time.
      * @return an {@link Event} instance reconstructed from the provided raw values.
      * @throws IllegalArgumentException if any provided value violates domain rules.
      */
@@ -56,17 +53,15 @@ public class EventFactory {
                                 String prettyName,
                                 String location,
                                 BigDecimal price,
-                                LocalDate startDate,
-                                LocalDate endDate,
-                                LocalTime startTime,
-                                LocalTime endTime) {
+                                LocalDateTime startDateTime,
+                                LocalDateTime endDateTime) {
         return new Event(
                 id,
                 name,
                 PrettyNameVO.of(prettyName),
                 location,
                 price,
-                new EventPeriodVO(startDate, startTime, endDate, endTime)
+                new EventPeriodVO(startDateTime, endDateTime)
         );
     }
 }

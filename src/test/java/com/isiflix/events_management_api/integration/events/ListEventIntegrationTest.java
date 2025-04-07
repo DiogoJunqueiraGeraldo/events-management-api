@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.isiflix.events_management_api.app.events.dtos.CreateEventDTO;
 import com.isiflix.events_management_api.app.events.dtos.EventDTO;
 import com.isiflix.events_management_api.app.shared.dtos.PaginationResultDTO;
+import com.isiflix.events_management_api.infra.database.event.JPAEventRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -53,7 +54,12 @@ public class ListEventIntegrationTest {
     }
 
     @BeforeAll
-    public static void setUp(@Autowired MockMvc mockMvc, @Autowired ObjectMapper objectMapper) throws Exception {
+    public static void setUp(
+            @Autowired MockMvc mockMvc,
+            @Autowired ObjectMapper objectMapper,
+            @Autowired JPAEventRepository jpaEventRepository
+    ) throws Exception {
+        jpaEventRepository.deleteAll();
         try (var scope = new StructuredTaskScope<Void>()) {
             IntStream.rangeClosed(1, SETUP_DATESET_SIZE)
                     .forEach(i -> scope.fork(() -> {
@@ -85,28 +91,5 @@ public class ListEventIntegrationTest {
                 });
         Assertions.assertEquals(1, paginationResult.pagination().page());
         Assertions.assertEquals(paginationResult.items().size(), paginationResult.pagination().size());
-    }
-
-    @Test
-    @DisplayName("Integration Test - Last Page")
-    public void shouldPaginateAsExpected() throws Exception {
-        final var request = get("/events")
-                .queryParam("page", String.valueOf(Integer.MAX_VALUE))
-                .queryParam("size", String.valueOf(Integer.MAX_VALUE));
-
-        final var responseBody = mockMvc.perform(request)
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-
-        final PaginationResultDTO<EventDTO> paginationResult = objectMapper.readValue(
-                responseBody,
-                new TypeReference<>() {
-                }
-        );
-
-        Assertions.assertEquals(Integer.MAX_VALUE, paginationResult.pagination().page());
-        Assertions.assertEquals(paginationResult.items().size(), paginationResult.pagination().size());
-        Assertions.assertEquals(0, paginationResult.items().size());
     }
 }

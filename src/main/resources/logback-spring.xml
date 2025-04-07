@@ -8,5 +8,4 @@
     <root level="INFO">
         <appender-ref ref="JSON_CONSOLE"/>
     </root>
-
 </configuration>
