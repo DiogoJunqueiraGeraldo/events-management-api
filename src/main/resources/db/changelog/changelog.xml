@@ -2,7 +2,7 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                    https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
-
     <changeSet id="1" author="diogo"><sqlFile path="db/sql/V1__create_events_table.sql"/></changeSet>
-
+    <changeSet id="2" author="diogo"><sqlFile path="db/sql/V2__create_users_table.sql"/></changeSet>
+    <changeSet id="3" author="diogo"><sqlFile path="db/sql/V3__create_subscriptions_table.sql"/></changeSet>
 </databaseChangeLog>
