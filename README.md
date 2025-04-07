@@ -49,7 +49,7 @@ of this size — but exploring them would be a great way to dive into small yet 
 ### Configuration & Secrets
 - [x] No hardcoded values
 - [x] External config via profiles (`application.yml`, `application-prod.yml`)
-- [ ] Secrets via environment variables or secret manager
+- [x] Secrets via environment variables or secret manager
 
 ### Security Basics
 - [ ] Authentication implemented (JWT, OAuth2, etc.)
@@ -70,7 +70,7 @@ of this size — but exploring them would be a great way to dive into small yet 
 **Optional but appreciated:**
 - [ ] CI pipeline (GitHub Actions, GitLab CI, etc.)
 - [ ] Static code analysis (SonarQube, PMD, etc.)
-- [ ] Docker Compose or Helm chart for local/test deploy
+- [x] Docker Compose or Helm chart for local/test deploy
 - [ ] Coverage reports that actually matter
 
 
