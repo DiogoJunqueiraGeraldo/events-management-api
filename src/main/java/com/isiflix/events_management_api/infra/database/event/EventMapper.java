@@ -11,8 +11,8 @@ public class EventMapper {
                 dto.prettyName(),
                 dto.location(),
                 dto.price(),
-                dto.startDate().atTime(dto.startTime()),
-                dto.endDate().atTime(dto.endTime())
+                dto.startDateTime(),
+                dto.endDateTime()
         );
     }
 

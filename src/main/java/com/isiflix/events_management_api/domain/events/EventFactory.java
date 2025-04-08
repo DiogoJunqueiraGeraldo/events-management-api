@@ -22,10 +22,8 @@ public class EventFactory {
                 createEventDTO.location(),
                 createEventDTO.price(),
                 new EventPeriodVO(
-                        createEventDTO.startDate(),
-                        createEventDTO.startTime(),
-                        createEventDTO.endDate(),
-                        createEventDTO.endTime()
+                        createEventDTO.startDateTime(),
+                        createEventDTO.endDateTime()
                 )
         );
     }

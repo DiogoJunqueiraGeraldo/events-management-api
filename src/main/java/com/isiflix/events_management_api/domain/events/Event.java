@@ -70,10 +70,8 @@ public class Event {
                 this.prettyName.prettyName(),
                 this.location,
                 this.price,
-                this.period.startDateTime().toLocalDate(),
-                this.period.endDateTime().toLocalDate(),
-                this.period.startDateTime().toLocalTime(),
-                this.period.endDateTime().toLocalTime()
+                this.period.startDateTime(),
+                this.period.endDateTime()
         );
     }
 

@@ -3,7 +3,7 @@ package com.isiflix.events_management_api.integration.events;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.isiflix.events_management_api.app.events.dtos.CreateEventDTO;
 import com.isiflix.events_management_api.app.events.dtos.EventDTO;
-import com.isiflix.events_management_api.app.shared.dtos.PaginationResultDTO;
+import com.isiflix.events_management_api.app.shared.PaginationResponse;
 import com.isiflix.events_management_api.infra.database.event.JPAEventRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -42,14 +42,17 @@ public class ListEventIntegrationTest {
     }
 
     private static CreateEventDTO createEventMock(int i) {
+        final var morningTime = LocalTime.of(10, 0);
+        final var eveningTime = LocalTime.of(20, 0);
+
+        final var tomorrow = LocalDate.now().plusDays(i);
+
         return new CreateEventDTO(
                 "Event %d".formatted(i),
                 "Location %d".formatted(i),
                 BigDecimal.valueOf(i * 10L),
-                LocalDate.now().plusDays(i),
-                LocalDate.now().plusDays(i + 1),
-                LocalTime.of(10, 0),
-                LocalTime.of(18, 0)
+                tomorrow.atTime(morningTime),
+                tomorrow.atTime(eveningTime)
         );
     }
 
@@ -86,7 +89,7 @@ public class ListEventIntegrationTest {
                 .getResponse()
                 .getContentAsString();
 
-        final PaginationResultDTO<EventDTO> paginationResult = objectMapper
+        final PaginationResponse<EventDTO> paginationResult = objectMapper
                 .readValue(responseBody, new TypeReference<>() {
                 });
         Assertions.assertEquals(1, paginationResult.pagination().page());

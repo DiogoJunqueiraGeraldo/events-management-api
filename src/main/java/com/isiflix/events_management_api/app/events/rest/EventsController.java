@@ -1,11 +1,8 @@
-package com.isiflix.events_management_api.app.events.controllers;
+package com.isiflix.events_management_api.app.events.rest;
 
+import com.isiflix.events_management_api.app.events.*;
 import com.isiflix.events_management_api.app.events.dtos.CreateEventDTO;
-import com.isiflix.events_management_api.app.events.dtos.EventDTO;
-import com.isiflix.events_management_api.app.events.use_cases.CreateEventUseCase;
-import com.isiflix.events_management_api.app.events.use_cases.FindEventUseCase;
-import com.isiflix.events_management_api.app.events.use_cases.ListEventsUseCase;
-import com.isiflix.events_management_api.app.shared.dtos.PaginationResultDTO;
+import com.isiflix.events_management_api.app.shared.PaginationResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,14 +29,15 @@ public class EventsController {
 
     @PostMapping("/events")
     @ResponseStatus(HttpStatus.CREATED)
-    public EventDTO createNewEvent(@Valid @RequestBody CreateEventRequest createEventRequest) {
+    public EventResponse createNewEvent(@Valid @RequestBody CreateEventRequest createEventRequest) {
         final var createEventDTO = CreateEventDTO.of(createEventRequest);
-        return createEventUseCase.createNewEvent(createEventDTO);
+        final var createdEvent = createEventUseCase.createNewEvent(createEventDTO);
+        return EventResponse.of(createdEvent);
     }
 
     @GetMapping("/events")
     @ResponseStatus(HttpStatus.OK)
-    public PaginationResultDTO<EventDTO> findAllEvents(
+    public PaginationResponse<EventResponse> findAllEvents(
             @Valid
             @Positive(message = "Query Param 'page' must be positive")
             @RequestParam(required = false, defaultValue = "1")
@@ -50,14 +48,20 @@ public class EventsController {
             @RequestParam(required = false, defaultValue = "50")
             int size
     ) {
-        final var items = listEventsUseCase.list(page, size);
-        return PaginationResultDTO.from(items, page, items.size());
+        final var items = listEventsUseCase.list(page, size)
+                .stream()
+                .map(EventResponse::of)
+                .toList();
+
+        return PaginationResponse.from(items, page, items.size());
     }
 
     @GetMapping("/events/{prettyName}")
-    public ResponseEntity<EventDTO> findEvent(@PathVariable String prettyName) throws NoResourceFoundException {
+    public ResponseEntity<EventResponse> findEvent(@PathVariable String prettyName) throws NoResourceFoundException {
         final var event = findEventUseCase.find(prettyName);
-        return event.map(ResponseEntity::ok)
+        return event
+                .map(EventResponse::of)
+                .map(ResponseEntity::ok)
                 .orElseThrow(() -> new NoResourceFoundException(HttpMethod.GET, "/events/".concat(prettyName)));
     }
 }

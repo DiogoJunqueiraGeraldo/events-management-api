@@ -2,8 +2,8 @@ package com.isiflix.events_management_api.integration.events;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.isiflix.events_management_api.app.errors.StandardErrorResponse;
-import com.isiflix.events_management_api.app.events.controllers.CreateEventRequest;
-import com.isiflix.events_management_api.app.events.dtos.EventDTO;
+import com.isiflix.events_management_api.app.events.rest.CreateEventRequest;
+import com.isiflix.events_management_api.app.events.rest.EventResponse;
 import com.isiflix.events_management_api.domain.errors.ViolationCode;
 import com.isiflix.events_management_api.infra.database.event.JPAEventRepository;
 import org.junit.jupiter.api.Assertions;
@@ -72,7 +72,7 @@ public class CreateEventIntegrationTest {
                 .getResponse()
                 .getContentAsString();
 
-        final var response = objectMapper.readValue(responseBody, EventDTO.class);
+        final var response = objectMapper.readValue(responseBody, EventResponse.class);
 
         Assertions.assertNotNull(response.id());
         Assertions.assertEquals(createEventRequest.name(), response.name());

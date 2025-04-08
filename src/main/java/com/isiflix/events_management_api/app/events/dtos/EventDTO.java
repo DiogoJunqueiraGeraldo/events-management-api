@@ -1,8 +1,7 @@
 package com.isiflix.events_management_api.app.events.dtos;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 
 public record EventDTO(
         Long id,
@@ -10,8 +9,6 @@ public record EventDTO(
         String prettyName,
         String location,
         BigDecimal price,
-        LocalDate startDate,
-        LocalDate endDate,
-        LocalTime startTime,
-        LocalTime endTime
+        LocalDateTime startDateTime,
+        LocalDateTime endDateTime
 ) { }

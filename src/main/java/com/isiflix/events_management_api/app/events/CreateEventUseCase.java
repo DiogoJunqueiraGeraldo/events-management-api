@@ -1,4 +1,4 @@
-package com.isiflix.events_management_api.app.events.use_cases;
+package com.isiflix.events_management_api.app.events;
 
 import com.isiflix.events_management_api.app.events.dtos.CreateEventDTO;
 import com.isiflix.events_management_api.app.events.dtos.EventDTO;
