@@ -1,8 +1,9 @@
 package com.isiflix.events_management_api.app.events;
 
 import com.isiflix.events_management_api.app.events.dtos.EventDTO;
+import com.isiflix.events_management_api.domain.events.Event;
 import com.isiflix.events_management_api.domain.events.EventRepository;
-import com.isiflix.events_management_api.domain.events.EventService;
+import com.isiflix.events_management_api.domain.events.vos.PrettyNameVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -10,14 +11,15 @@ import java.util.Optional;
 
 @Service
 public class FindEventUseCase {
-    private final EventService eventService;
+    private final EventRepository eventRepository;
 
     @Autowired
     public FindEventUseCase(EventRepository eventRepository) {
-        this.eventService = new EventService(eventRepository);
+        this.eventRepository = eventRepository;
     }
 
     public Optional<EventDTO> find(String prettyName) {
-        return eventService.findByPrettyName(prettyName);
+        return eventRepository.findByPrettyName(PrettyNameVO.of(prettyName))
+                .map(Event::toDTO);
     }
 }
