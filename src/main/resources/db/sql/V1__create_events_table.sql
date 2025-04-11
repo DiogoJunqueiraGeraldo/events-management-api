@@ -7,7 +7,7 @@ create sequence ems_events_id_seq
 
 create table if not exists ems_events
 (
-    id               bigint primary key default nextval('ems_events_id_seq'),
+    id               bigint primary key,
     name             varchar(200)   not null,
     pretty_name      varchar(200)   not null unique,
     location         varchar(200)   not null default 'online',
