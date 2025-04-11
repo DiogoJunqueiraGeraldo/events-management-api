@@ -6,7 +6,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface EventRepository {
-    Long save(Event event);
+    Long nextId();
+
+    void save(Event event);
 
     List<Event> list(int page, int size);
 

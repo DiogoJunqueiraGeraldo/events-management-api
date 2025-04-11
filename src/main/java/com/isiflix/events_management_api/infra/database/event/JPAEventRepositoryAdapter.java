@@ -28,14 +28,9 @@ public class JPAEventRepositoryAdapter implements EventRepository {
     }
 
     @Override
-    public Long save(Event event) {
-        final var emptyEntity = EventMapper.toEntity(event);
-        final Long id = this.nextId();
-
-        emptyEntity.setId(id);
-        this.jpaEventRepository.save(emptyEntity);
-
-        return id;
+    public void save(Event event) {
+        final var entity = EventMapper.toEntity(event);
+        this.jpaEventRepository.save(entity);
     }
 
     @Override
@@ -74,7 +69,7 @@ public class JPAEventRepositoryAdapter implements EventRepository {
      * distributed ID generation approach, such as Snowflake, ULID, or UUIDv7.
      * </p>
      */
-    private Long nextId() {
+    public Long nextId() {
         return (Long) entityManager
                 .createNativeQuery("SELECT nextval('ems_events_id_seq')")
                 .getSingleResult();

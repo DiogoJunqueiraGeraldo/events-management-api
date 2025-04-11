@@ -8,16 +8,10 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public class EventFactory {
-    /**
-     * Creates a new {@link Event} entity based on the provided {@link CreateEventDTO}.
-     * <p>
-     *
-     * @param createEventDTO the DTO containing details required to create a new event; must not be {@code null}.
-     * @return a new {@link Event} entity.
-     * @throws IllegalArgumentException if the provided DTO contains invalid or inconsistent data.
-     */
-    public static Event create(CreateEventDTO createEventDTO) {
+
+    public static Event create(Long id, CreateEventDTO createEventDTO) {
         return new Event(
+                id,
                 createEventDTO.name(),
                 createEventDTO.location(),
                 createEventDTO.price(),

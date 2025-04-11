@@ -39,6 +39,7 @@ public class EventEntity {
     private LocalDateTime createdDatetime = LocalDateTime.now();
 
     public EventEntity(
+            Long id,
             String name,
             String prettyName,
             String location,
@@ -46,6 +47,7 @@ public class EventEntity {
             LocalDateTime startDatetime,
             LocalDateTime endDatetime
     ) {
+        this.id = id;
         this.name = name;
         this.prettyName = prettyName;
         this.location = location;

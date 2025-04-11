@@ -7,6 +7,7 @@ public class EventMapper {
     public static EventEntity toEntity(Event event) {
         final var dto = event.toDTO();
         return new EventEntity(
+                dto.id(),
                 dto.name(),
                 dto.prettyName(),
                 dto.location(),
