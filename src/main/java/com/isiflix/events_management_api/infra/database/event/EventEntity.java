@@ -14,7 +14,12 @@ import java.time.LocalDateTime;
 @Table(name = "ems_events")
 public class EventEntity {
     @Id
-    @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "event_seq")
+    @SequenceGenerator(
+            name = "event_seq",
+            sequenceName = "ems_events_id_seq",
+            allocationSize = 50
+    )
     private Long id;
 
     @Column(nullable = false, length = 200)

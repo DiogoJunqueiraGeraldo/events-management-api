@@ -1,6 +1,13 @@
+create sequence ems_events_id_seq
+    start with 1
+    increment by 50
+    minvalue 1
+    no maxvalue
+    cache 1;
+
 create table if not exists ems_events
 (
-    id               bigserial primary key,
+    id               bigint primary key default nextval('ems_events_id_seq'),
     name             varchar(200)   not null,
     pretty_name      varchar(200)   not null unique,
     location         varchar(200)   not null default 'online',
@@ -12,3 +19,4 @@ create table if not exists ems_events
 );
 
 -- drop table ems_events;
+-- drop sequence ems_events_id_seq;

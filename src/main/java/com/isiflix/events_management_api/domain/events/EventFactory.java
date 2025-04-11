@@ -9,9 +9,8 @@ import java.time.LocalDateTime;
 
 public class EventFactory {
 
-    public static Event create(Long id, CreateEventDTO createEventDTO) {
+    public static Event create(CreateEventDTO createEventDTO) {
         return new Event(
-                id,
                 createEventDTO.name(),
                 createEventDTO.location(),
                 createEventDTO.price(),

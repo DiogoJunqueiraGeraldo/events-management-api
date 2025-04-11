@@ -4,6 +4,7 @@ import com.isiflix.events_management_api.app.events.dtos.CreateEventDTO;
 import com.isiflix.events_management_api.app.events.dtos.EventDTO;
 import com.isiflix.events_management_api.domain.errors.BusinessRuleViolationException;
 import com.isiflix.events_management_api.domain.errors.ViolationCode;
+import com.isiflix.events_management_api.domain.events.Event;
 import com.isiflix.events_management_api.domain.events.EventFactory;
 import com.isiflix.events_management_api.domain.events.EventRepository;
 import com.isiflix.events_management_api.domain.events.vos.PrettyNameVO;
@@ -26,30 +27,18 @@ public class CreateEventUseCase {
     }
 
     public EventDTO createNewEvent(CreateEventDTO createEventDTO) {
-        // Avoid sequence exhaustion: pre-check to skip ID allocation when input is invalid
-        PrettyNameVO prettyName = PrettyNameVO.of(createEventDTO.name());
-        if(this.eventRepository.findByPrettyName(prettyName).isPresent()) {
-            throwPrettyNameAlreadyExists(prettyName);
-        }
-
-        // Sequence numbers are non-transactional – allocate only when needed
-        Long id = this.eventRepository.nextId();
-        final var event = EventFactory.create(id, createEventDTO);
+        Event event = EventFactory.create(createEventDTO);
 
         try {
-            // Attempt insert, rely on DB constraint as last-resort safety net
-            this.eventRepository.save(event);
+            Event persistedEvent = this.eventRepository.save(event);
+            return persistedEvent.toDTO();
         } catch (DataIntegrityViolationException e) {
-            // Graceful fallback for race condition on pretty name
-            if(isPrettyNameConstraintViolation(e)) {
+            if (isPrettyNameConstraintViolation(e)) {
                 throwPrettyNameAlreadyExists(event.getPrettyName());
             }
 
-            // Unexpected integrity violation
             throw e;
         }
-
-        return event.toDTO();
     }
 
     private void throwPrettyNameAlreadyExists(PrettyNameVO prettyName) {

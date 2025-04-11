@@ -24,8 +24,7 @@ public class Event {
      * @param price event price, it can be for free, but don't try to get smart about it
      * @param period event period, it should be consistence, otherwise it won't instantiate
      */
-    protected Event(Long id, String name, String location, BigDecimal price, EventPeriodVO period) {
-        setId(id);
+    protected Event(String name, String location, BigDecimal price, EventPeriodVO period) {
         setName(name);
         setLocation(location);
         setPrice(price);
