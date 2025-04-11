@@ -5,12 +5,15 @@ import com.isiflix.events_management_api.app.errors.StandardErrorResponse;
 import com.isiflix.events_management_api.app.events.rest.CreateEventRequest;
 import com.isiflix.events_management_api.app.events.rest.EventResponse;
 import com.isiflix.events_management_api.infra.database.event.JPAEventRepository;
+import com.isiflix.events_management_api.utils.PostgresTestContainerConfiguration;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -24,6 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Import(PostgresTestContainerConfiguration.class)
 public class FindEventIntegrationTest {
     private final MockMvc mockMvc;
     private final ObjectMapper objectMapper;

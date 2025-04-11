@@ -6,6 +6,7 @@ import com.isiflix.events_management_api.app.events.rest.CreateEventRequest;
 import com.isiflix.events_management_api.app.events.rest.EventResponse;
 import com.isiflix.events_management_api.domain.errors.ViolationCode;
 import com.isiflix.events_management_api.infra.database.event.JPAEventRepository;
+import com.isiflix.events_management_api.utils.PostgresTestContainerConfiguration;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -13,8 +14,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -28,7 +35,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Import(PostgresTestContainerConfiguration.class)
 public class CreateEventIntegrationTest {
+
     private final MockMvc mockMvc;
     private final ObjectMapper objectMapper;
     private final JPAEventRepository jpaEventRepository;
