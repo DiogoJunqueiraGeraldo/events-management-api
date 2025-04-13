@@ -1,6 +1,7 @@
 package com.isiflix.events_management_api.app.errors;
 
 import com.isiflix.events_management_api.domain.errors.ViolationCode;
+import org.springframework.http.HttpStatus;
 
 public class StatusCodeMapper {
     /**
@@ -18,9 +19,12 @@ public class StatusCodeMapper {
      * @return the HTTP status code to be returned by the application layer
      */
     public int of(ViolationCode violationCode) {
-        return switch (violationCode) {
-            case CONFLICT_PRETTY_NAME_ALREADY_EXISTS -> 409;
+        final var statusCode = switch (violationCode) {
+            case CONFLICT_PRETTY_NAME_ALREADY_EXISTS -> HttpStatus.CONFLICT;
+            case CANT_SUBSCRIBE_TO_NON_EXISTING_EVENT -> HttpStatus.NOT_FOUND;
             // don't you dare add a default clause
         };
+
+        return statusCode.value();
     }
 }

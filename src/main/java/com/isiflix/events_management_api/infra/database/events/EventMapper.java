@@ -1,4 +1,4 @@
-package com.isiflix.events_management_api.infra.database.event;
+package com.isiflix.events_management_api.infra.database.events;
 
 import com.isiflix.events_management_api.domain.events.Event;
 import com.isiflix.events_management_api.domain.events.EventFactory;

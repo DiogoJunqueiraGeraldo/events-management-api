@@ -4,7 +4,8 @@ import java.util.Arrays;
 import java.util.Optional;
 
 public enum ViolationCode {
-    CONFLICT_PRETTY_NAME_ALREADY_EXISTS("conflict-pretty-name-already-exists");
+    CONFLICT_PRETTY_NAME_ALREADY_EXISTS("conflict-pretty-name-already-exists"),
+    CANT_SUBSCRIBE_TO_NON_EXISTING_EVENT("cant-subscribe-to-non-existing-event"),;
 
     private final String code;
     ViolationCode(String code) {

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @RestController
+@RequestMapping("/events")
 public class EventsController {
     private final CreateEventUseCase createEventUseCase;
     private final ListEventsUseCase listEventsUseCase;
@@ -27,7 +28,7 @@ public class EventsController {
         this.findEventUseCase = findEventUseCase;
     }
 
-    @PostMapping("/events")
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public EventResponse createNewEvent(@Valid @RequestBody CreateEventRequest createEventRequest) {
         final var createEventDTO = CreateEventDTO.of(createEventRequest);
@@ -35,7 +36,7 @@ public class EventsController {
         return EventResponse.of(createdEvent);
     }
 
-    @GetMapping("/events")
+    @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public PaginationResponse<EventResponse> findAllEvents(
             @Valid
@@ -56,7 +57,7 @@ public class EventsController {
         return PaginationResponse.from(items, page, items.size());
     }
 
-    @GetMapping("/events/{prettyName}")
+    @GetMapping("/{prettyName}")
     public ResponseEntity<EventResponse> findEvent(@PathVariable String prettyName) throws NoResourceFoundException {
         final var event = findEventUseCase.find(prettyName);
         return event

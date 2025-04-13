@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.isiflix.events_management_api.app.events.dtos.CreateEventDTO;
 import com.isiflix.events_management_api.app.events.dtos.EventDTO;
 import com.isiflix.events_management_api.app.shared.PaginationResponse;
-import com.isiflix.events_management_api.infra.database.event.JPAEventRepository;
+import com.isiflix.events_management_api.infra.database.events.JPAEventRepository;
 import com.isiflix.events_management_api.utils.PostgresTestContainerConfiguration;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
