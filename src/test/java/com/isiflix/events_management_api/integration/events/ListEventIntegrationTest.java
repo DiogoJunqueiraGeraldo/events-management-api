@@ -10,7 +10,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -45,35 +44,34 @@ public class ListEventIntegrationTest {
     @Autowired
     JPAEventRepository jpaEventRepository;
 
-    private static boolean eventsLoaded = false;
     private static EventEntity createEventMock(int i) {
         final var morningTime = LocalTime.of(10, 0);
         final var eveningTime = LocalTime.of(20, 0);
 
         final var tomorrow = LocalDate.now().plusDays(i);
 
+
         return new EventEntity(
                 null,
                 "Event %d".formatted(i),
                 "event-%d".formatted(i),
                 "Location %d".formatted(i),
-                BigDecimal.valueOf(i * 10L),
+                BigDecimal.valueOf(i),
                 tomorrow.atTime(morningTime),
                 tomorrow.atTime(eveningTime)
         );
     }
 
+    public static boolean eventsLoaded = false;
     @BeforeEach
-    @Transactional
     void setUp() {
         if(!eventsLoaded) {
             List<EventEntity> events = IntStream.range(0, SETUP_DATESET_SIZE)
                     .mapToObj(ListEventIntegrationTest::createEventMock)
                     .toList();
 
-            jpaEventRepository.saveAll(events);
+            jpaEventRepository.saveAllAndFlush(events);
         }
-
         eventsLoaded = true;
     }
 
