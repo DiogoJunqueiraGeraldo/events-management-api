@@ -19,6 +19,13 @@ public record Subscription(Long id, Event event, User user) {
     }
 
     public SubscriptionDTO toDTO() {
-        return new SubscriptionDTO(id, event.toDTO(), user.toDTO());
+        return new SubscriptionDTO(id, event.toDTO(), user.toDTO(), buildDesignation());
+    }
+
+    private String buildDesignation() {
+        return "https://devstage.com/%s/%d".formatted(
+                event.getPrettyName().prettyName(),
+                user.getId()
+        );
     }
 }

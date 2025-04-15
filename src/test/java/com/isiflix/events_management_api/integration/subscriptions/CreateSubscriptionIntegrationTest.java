@@ -173,7 +173,7 @@ public class CreateSubscriptionIntegrationTest {
 
     @Test
     @DisplayName("Integration Test - Create Subscription For Non Existing User")
-    public void shouldReturnSubscriptionNumberAndDesignationForNewUser() throws Exception {
+    public void shouldReturnSubscriptionNumberAndBuildDesignationForNewUser() throws Exception {
         jpaUserRepository.findByEmail("john@doe.com")
                 .ifPresent(userEntity -> jpaUserRepository.delete(userEntity));
 
@@ -204,7 +204,7 @@ public class CreateSubscriptionIntegrationTest {
 
     @Test
     @DisplayName("Integration Test - Create Subscription For Existing User")
-    public void shouldReturnSubscriptionNumberAndDesignationForExistingUser() throws Exception {
+    public void shouldReturnSubscriptionNumberAndBuildDesignationForExistingUser() throws Exception {
         final var existingUser = jpaUserRepository.findByEmail("foo@bar.com");
         assertThat(existingUser).isPresent();
 

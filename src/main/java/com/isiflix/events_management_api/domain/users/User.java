@@ -28,4 +28,8 @@ public class User {
     public String getEmail() {
         return email;
     }
+
+    public Object getId() {
+        return id;
+    }
 }
