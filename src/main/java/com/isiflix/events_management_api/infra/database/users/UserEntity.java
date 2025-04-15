@@ -1,4 +1,4 @@
-package com.isiflix.events_management_api.infra.database.subscriptions;
+package com.isiflix.events_management_api.infra.database.users;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -30,4 +30,10 @@ public class UserEntity {
 
     @Column(name = "created_datetime")
     private LocalDateTime createdDatetime = LocalDateTime.now();
+
+    public UserEntity(Long id, String name, String email) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+    }
 }

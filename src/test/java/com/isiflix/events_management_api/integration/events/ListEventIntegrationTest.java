@@ -1,57 +1,61 @@
 package com.isiflix.events_management_api.integration.events;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.isiflix.events_management_api.app.events.dtos.CreateEventDTO;
-import com.isiflix.events_management_api.app.events.dtos.EventDTO;
-import com.isiflix.events_management_api.app.shared.PaginationResponse;
+import com.isiflix.events_management_api.app.events.rest.EventPaginationResponse;
+import com.isiflix.events_management_api.infra.database.events.EventEntity;
 import com.isiflix.events_management_api.infra.database.events.JPAEventRepository;
-import com.isiflix.events_management_api.utils.PostgresTestContainerConfiguration;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.http.MediaType;
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.test.web.servlet.MockMvc;
-import com.fasterxml.jackson.core.type.TypeReference;
+import org.springframework.transaction.annotation.Transactional;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.concurrent.StructuredTaskScope;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.IntStream;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@Import(PostgresTestContainerConfiguration.class)
+@Testcontainers
 public class ListEventIntegrationTest {
-    private static final int SETUP_DATESET_SIZE = 1000;
-    private static final long SETUP_DEADLINE_IN_SECONDS = 2;
+    @Container
+    @ServiceConnection
+    static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16");
 
-    private final MockMvc mockMvc;
-    private final ObjectMapper objectMapper;
+    private static final int SETUP_DATESET_SIZE = 1000;
 
     @Autowired
-    public ListEventIntegrationTest(MockMvc mockMvc, ObjectMapper objectMapper) {
-        this.mockMvc = mockMvc;
-        this.objectMapper = objectMapper;
-    }
+    MockMvc mockMvc;
 
-    private static CreateEventDTO createEventMock(int i) {
+    @Autowired
+    ObjectMapper objectMapper;
+
+    @Autowired
+    JPAEventRepository jpaEventRepository;
+
+    private static boolean eventsLoaded = false;
+    private static EventEntity createEventMock(int i) {
         final var morningTime = LocalTime.of(10, 0);
         final var eveningTime = LocalTime.of(20, 0);
 
         final var tomorrow = LocalDate.now().plusDays(i);
 
-        return new CreateEventDTO(
+        return new EventEntity(
+                null,
                 "Event %d".formatted(i),
+                "event-%d".formatted(i),
                 "Location %d".formatted(i),
                 BigDecimal.valueOf(i * 10L),
                 tomorrow.atTime(morningTime),
@@ -59,29 +63,18 @@ public class ListEventIntegrationTest {
         );
     }
 
-    @BeforeAll
-    public static void setUp(
-            @Autowired MockMvc mockMvc,
-            @Autowired ObjectMapper objectMapper,
-            @Autowired JPAEventRepository jpaEventRepository
-    ) throws Exception {
-        jpaEventRepository.deleteAll();
-        try (var scope = new StructuredTaskScope<Void>()) {
-            IntStream.rangeClosed(1, SETUP_DATESET_SIZE)
-                    .forEach(i -> scope.fork(() -> {
-                        final var createEventRequest = createEventMock(i);
-                        final var payload = objectMapper.writeValueAsString(createEventRequest);
-                        final var request = post("/events")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(payload);
+    @BeforeEach
+    @Transactional
+    void setUp() {
+        if(!eventsLoaded) {
+            List<EventEntity> events = IntStream.range(0, SETUP_DATESET_SIZE)
+                    .mapToObj(ListEventIntegrationTest::createEventMock)
+                    .toList();
 
-                        mockMvc.perform(request).andExpect(status().isCreated());
-                        return null;
-                    }));
-
-            final var deadline = Instant.now().plusSeconds(SETUP_DEADLINE_IN_SECONDS);
-            scope.joinUntil(deadline);
+            jpaEventRepository.saveAll(events);
         }
+
+        eventsLoaded = true;
     }
 
     @Test
@@ -92,10 +85,84 @@ public class ListEventIntegrationTest {
                 .getResponse()
                 .getContentAsString();
 
-        final PaginationResponse<EventDTO> paginationResult = objectMapper
-                .readValue(responseBody, new TypeReference<>() {
-                });
-        Assertions.assertEquals(1, paginationResult.pagination().page());
-        Assertions.assertEquals(paginationResult.items().size(), paginationResult.pagination().size());
+        final EventPaginationResponse paginationResult = objectMapper
+                .readValue(responseBody, EventPaginationResponse.class);
+
+        assertThat(paginationResult.pagination().page()).isEqualTo(1);
+        assertThat(paginationResult.items().size()).isEqualTo(paginationResult.pagination().size());
+    }
+
+    @Test
+    @DisplayName("Integration Test - Next Page")
+    public void shouldHaveNextPage() throws Exception {
+        final int halfDataset = SETUP_DATESET_SIZE / 2;
+        final var request = get("/events")
+                .queryParam("page", "2")
+                .queryParam("size", Integer.toString(halfDataset));
+
+        final var responseBody = mockMvc.perform(request)
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        final EventPaginationResponse paginationResult = objectMapper
+                .readValue(responseBody, EventPaginationResponse.class);
+
+        assertThat(paginationResult.pagination().page()).isEqualTo(2);
+        assertThat(paginationResult.items().size()).isEqualTo(paginationResult.pagination().size());
+        assertThat(paginationResult.items().size()).isEqualTo(halfDataset);
+    }
+
+    @Test
+    @DisplayName("Integration Test - Last Page")
+    public void shouldHaveLastPage() throws Exception {
+        final int pageSize = SETUP_DATESET_SIZE / 2;
+        final var request = get("/events")
+                .queryParam("page", "3")
+                .queryParam("size", Integer.toString(pageSize));
+
+        final var responseBody = mockMvc.perform(request)
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        final EventPaginationResponse paginationResult = objectMapper
+                .readValue(responseBody, EventPaginationResponse.class);
+
+        assertThat(paginationResult.pagination().page()).isEqualTo(3);
+        assertThat(paginationResult.items().size()).isEqualTo(paginationResult.pagination().size());
+        assertThat(paginationResult.items().size()).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("Integration Test - Shouldn't Overlap Items")
+    public void shouldNotOverlapItems() throws Exception {
+        Set<Long> ids = new HashSet<>(SETUP_DATESET_SIZE);
+        final int pageSize = SETUP_DATESET_SIZE / 7;
+
+        final int UPPER_LIMIT = (SETUP_DATESET_SIZE / pageSize) + 1;
+        for(int i = 1; i < UPPER_LIMIT; i++) {
+            final var request = get("/events")
+                    .queryParam("page", Integer.toString(i))
+                    .queryParam("size", Integer.toString(pageSize));
+
+            final var responseBody = mockMvc.perform(request)
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            final EventPaginationResponse paginationResult = objectMapper
+                    .readValue(responseBody, EventPaginationResponse.class);
+
+
+            assertThat(paginationResult.items()).allSatisfy(event -> {
+                assertThat(ids).doesNotContain(event.id());
+                ids.add(event.id());
+            });
+
+            if(paginationResult.items().size() < pageSize) {
+                break;
+            }
+        }
     }
 }

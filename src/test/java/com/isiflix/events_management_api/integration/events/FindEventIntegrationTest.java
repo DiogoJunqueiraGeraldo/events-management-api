@@ -5,20 +5,23 @@ import com.isiflix.events_management_api.app.errors.StandardErrorResponse;
 import com.isiflix.events_management_api.app.events.rest.CreateEventRequest;
 import com.isiflix.events_management_api.app.events.rest.EventResponse;
 import com.isiflix.events_management_api.infra.database.events.JPAEventRepository;
-import com.isiflix.events_management_api.utils.PostgresTestContainerConfiguration;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -26,21 +29,23 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@Import(PostgresTestContainerConfiguration.class)
+@Testcontainers
 public class FindEventIntegrationTest {
-    private final MockMvc mockMvc;
-    private final ObjectMapper objectMapper;
-    private final JPAEventRepository jpaEventRepository;
+    @Container
+    @ServiceConnection
+    static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16");
+
+    @Autowired
+    MockMvc mockMvc;
+
+    @Autowired
+    ObjectMapper objectMapper;
+
+    @Autowired
+    JPAEventRepository jpaEventRepository;
 
     private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-
-    @Autowired
-    public FindEventIntegrationTest(MockMvc mockMvc, ObjectMapper objectMapper, JPAEventRepository jpaEventRepository) {
-        this.mockMvc = mockMvc;
-        this.objectMapper = objectMapper;
-        this.jpaEventRepository = jpaEventRepository;
-    }
 
     @BeforeEach
     void setUp() {
@@ -86,15 +91,15 @@ public class FindEventIntegrationTest {
 
         final var response = objectMapper.readValue(responseBody, EventResponse.class);
 
-        Assertions.assertNotNull(response.id());
-        Assertions.assertEquals(createEventRequest.name(), response.name());
-        Assertions.assertEquals(expectedPrettyName, response.prettyName());
-        Assertions.assertEquals(createEventRequest.price().doubleValue(), response.price().doubleValue());
-        Assertions.assertEquals(createEventRequest.location(), response.location());
-        Assertions.assertEquals(createEventRequest.startDate(), response.startDate());
-        Assertions.assertEquals(createEventRequest.endDate(), response.endDate());
-        Assertions.assertEquals(createEventRequest.startTime(), response.startTime());
-        Assertions.assertEquals(createEventRequest.endTime(), response.endTime());
+        assertThat(response.id()).isNotNull();
+        assertThat(response.name()).isEqualTo(createEventRequest.name());
+        assertThat(response.prettyName()).isEqualTo(expectedPrettyName);
+        assertThat(response.price()).isEqualByComparingTo(createEventRequest.price());
+        assertThat(response.location()).isEqualTo(createEventRequest.location());
+        assertThat(response.startDate()).isEqualTo(createEventRequest.startDate());
+        assertThat(response.endDate()).isEqualTo(createEventRequest.endDate());
+        assertThat(response.startTime()).isEqualTo(createEventRequest.startTime());
+        assertThat(response.endTime()).isEqualTo(createEventRequest.endTime());
     }
 
     @Test
@@ -108,8 +113,7 @@ public class FindEventIntegrationTest {
                 .getContentAsString();
 
         final var response = objectMapper.readValue(responseBody, StandardErrorResponse.class);
-        Assertions.assertEquals("not-found", response.code());
-        Assertions.assertNotNull(response.message());
-        Assertions.assertFalse(response.message().isBlank());
+        assertThat(response.code()).isEqualTo("not-found");
+        assertThat(response.message()).isNotBlank();
     }
 }

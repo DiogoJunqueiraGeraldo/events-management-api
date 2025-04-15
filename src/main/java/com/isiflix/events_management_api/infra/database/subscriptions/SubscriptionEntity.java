@@ -1,13 +1,12 @@
 package com.isiflix.events_management_api.infra.database.subscriptions;
 
 import com.isiflix.events_management_api.infra.database.events.EventEntity;
+import com.isiflix.events_management_api.infra.database.users.UserEntity;
 import jakarta.persistence.*;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @NoArgsConstructor
@@ -16,26 +15,29 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "ems_subscriptions")
 public class SubscriptionEntity {
-    @Embeddable
-    @EqualsAndHashCode
-    public static class SubscriptionEntityKey implements Serializable {
-        private Long eventId;
-        private Long userId;
-    }
-
-    @EmbeddedId
-    private SubscriptionEntityKey id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "subscription_seq")
+    @SequenceGenerator(
+            name = "subscription_seq",
+            sequenceName = "ems_subscriptions_id_seq",
+            allocationSize = 50
+    )
+    private Long id;
 
     @ManyToOne
-    @MapsId("eventId")
-    @JoinColumn(name = "event_id")
+    @JoinColumn(name = "event_id", nullable = false)
     private EventEntity event;
 
     @ManyToOne
-    @MapsId("userId")
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
     @Column(name = "created_datetime")
     private LocalDateTime createdDatetime = LocalDateTime.now();
+
+    public SubscriptionEntity(Long id, EventEntity event, UserEntity user) {
+        this.id = id;
+        this.event = event;
+        this.user = user;
+    }
 }

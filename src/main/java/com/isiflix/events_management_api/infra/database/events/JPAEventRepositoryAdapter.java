@@ -17,9 +17,7 @@ public class JPAEventRepositoryAdapter implements EventRepository {
     private final JPAEventRepository jpaEventRepository;
 
     @Autowired
-    public JPAEventRepositoryAdapter(
-            JPAEventRepository jpaEventRepository
-    ) {
+    public JPAEventRepositoryAdapter(JPAEventRepository jpaEventRepository) {
         this.jpaEventRepository = jpaEventRepository;
     }
 

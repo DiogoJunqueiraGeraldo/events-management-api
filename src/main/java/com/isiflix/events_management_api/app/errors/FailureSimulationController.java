@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/tests/simulate")
-@Profile("dev")
+@Profile({"dev", "test"})
 public class FailureSimulationController {
     @GetMapping("/unexpected-failure")
     @ResponseStatus(HttpStatus.OK)

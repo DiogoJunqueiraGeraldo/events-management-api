@@ -5,7 +5,8 @@ import java.util.Optional;
 
 public enum ViolationCode {
     CONFLICT_PRETTY_NAME_ALREADY_EXISTS("conflict-pretty-name-already-exists"),
-    CANT_SUBSCRIBE_TO_NON_EXISTING_EVENT("cant-subscribe-to-non-existing-event"),;
+    CANT_SUBSCRIBE_TO_NON_EXISTING_EVENT("cant-subscribe-to-non-existing-event"),
+    CONFLICT_USER_ALREADY_SUBSCRIBED_TO_EVENT("conflict-user-already-subscribed-to-event");
 
     private final String code;
     ViolationCode(String code) {

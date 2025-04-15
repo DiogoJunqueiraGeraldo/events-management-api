@@ -2,7 +2,6 @@ package com.isiflix.events_management_api.app.events.rest;
 
 import com.isiflix.events_management_api.app.events.*;
 import com.isiflix.events_management_api.app.events.dtos.CreateEventDTO;
-import com.isiflix.events_management_api.app.shared.PaginationResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +37,7 @@ public class EventsController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public PaginationResponse<EventResponse> findAllEvents(
+    public EventPaginationResponse findAllEvents(
             @Valid
             @Positive(message = "Query Param 'page' must be positive")
             @RequestParam(required = false, defaultValue = "1")
@@ -54,7 +53,7 @@ public class EventsController {
                 .map(EventResponse::of)
                 .toList();
 
-        return PaginationResponse.from(items, page, items.size());
+        return EventPaginationResponse.from(items, page, items.size());
     }
 
     @GetMapping("/{prettyName}")

@@ -33,6 +33,9 @@ public class CreateEventUseCase {
             Event persistedEvent = this.eventRepository.save(event);
             return persistedEvent.toDTO();
         } catch (DataIntegrityViolationException e) {
+            // @warn: this works because the use case is *not* transactional
+            // if that changes, you'll either need to handle this exception at the global level
+            // or update the repository adapter to flush in order to trigger constraint checks
             if (isPrettyNameConstraintViolation(e)) {
                 throwPrettyNameAlreadyExists(event.getPrettyName());
             }

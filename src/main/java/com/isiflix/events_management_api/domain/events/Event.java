@@ -3,6 +3,7 @@ package com.isiflix.events_management_api.domain.events;
 import com.isiflix.events_management_api.app.events.dtos.EventDTO;
 import com.isiflix.events_management_api.domain.events.vos.EventPeriodVO;
 import com.isiflix.events_management_api.domain.events.vos.PrettyNameVO;
+import com.isiflix.events_management_api.domain.users.User;
 
 import java.math.BigDecimal;
 
@@ -73,6 +74,10 @@ public class Event {
                 this.period.startDateTime(),
                 this.period.endDateTime()
         );
+    }
+
+    public Subscription subscribe(User user) {
+        return new Subscription(null, this, user);
     }
 
     public void setId(Long id) {

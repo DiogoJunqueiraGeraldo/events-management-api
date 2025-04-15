@@ -10,52 +10,60 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.time.OffsetDateTime;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Testcontainers
+@ActiveProfiles("test")
 public class GlobalExceptionHandlerIntegrationTest {
-    private final MockMvc mockMvc;
-    private final ObjectMapper objectMapper;
+    @Container
+    @ServiceConnection
+    static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16");
 
     @Autowired
-    public GlobalExceptionHandlerIntegrationTest(MockMvc mockMvc, ObjectMapper objectMapper) {
-        this.mockMvc = mockMvc;
-        this.objectMapper = objectMapper;
-    }
+    MockMvc mockMvc;
+
+    @Autowired
+    ObjectMapper objectMapper;
 
     private void assertErrorResponseWithoutIssues(String responseBody, String errorCode) {
         Assertions.assertDoesNotThrow(() -> {
             final var error = objectMapper.readValue(responseBody, StandardErrorResponse.class);
-            assertEquals(errorCode, error.code());
-            assertTrue(OffsetDateTime.now().isAfter(error.moment()));
-            assertFalse(error.message().isBlank());
-            assertNull(error.issues());
+            assertThat(error.code()).isEqualTo(errorCode);
+            assertThat(OffsetDateTime.now()).isAfter(error.moment());
+            assertThat(error.message()).isNotBlank();
+            assertThat(error.issues()).isNull();
         });
     }
 
-    private void assertInvalidParameters(String responseBody, List<String> issues) {
+    private void assertInvalidParameters(String responseBody, List<String> expectedIssues) {
         Assertions.assertDoesNotThrow(() -> {
             final var error = objectMapper.readValue(responseBody, StandardErrorResponse.class);
-            assertEquals("invalid-parameters", error.code());
-            assertTrue(OffsetDateTime.now().isAfter(error.moment()));
-            assertFalse(error.message().isBlank());
-            issues.forEach(issueName -> Assertions.assertTrue(error.issues().containsKey(issueName)));
+            assertThat(error.code()).isEqualTo("invalid-parameters");
+            assertThat(OffsetDateTime.now()).isAfter(error.moment());
+            assertThat(error.message()).isNotBlank();
+            assertThat(error.issues()).containsOnlyKeys(expectedIssues);
         });
     }
 
     @Test
     @DisplayName("Integration Test - Unexpected Failure - Log Level")
     public void shouldLogErrorLevelLogsForUnexpectedFailure() throws Exception {
-        try(final LogCaptor logCaptor = LogCaptor.forClass(GlobalExceptionHandler.class)) {
+        try (final LogCaptor logCaptor = LogCaptor.forClass(GlobalExceptionHandler.class)) {
             final var responseBody = mockMvc.perform(get("/tests/simulate/unexpected-failure"))
                     .andExpect(status().isInternalServerError())
                     .andReturn()
@@ -63,9 +71,9 @@ public class GlobalExceptionHandlerIntegrationTest {
                     .getContentAsString();
 
             final var response = objectMapper.readValue(responseBody, StandardErrorResponse.class);
-            Assertions.assertEquals("unexpected-error",response.code());
-            Assertions.assertFalse(response.message().isBlank());
-            Assertions.assertEquals(1, logCaptor.getErrorLogs().size());
+            assertThat(response.code()).isEqualTo("unexpected-error");
+            assertThat(response.message()).isNotBlank();
+            assertThat(logCaptor.getErrorLogs()).hasSize(1);
         }
     }
 
