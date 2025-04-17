@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public class UserRepositoryAdapter implements UserRepository {
     private static final Logger logger = LoggerFactory.getLogger(UserRepositoryAdapter.class);
@@ -24,6 +26,12 @@ public class UserRepositoryAdapter implements UserRepository {
         return jpaUserRepository.findByEmail(user.getEmail())
             .map(UserMapper::fromEntity)
             .orElseGet(() -> this.saveOnConflictDoNothing(user));
+    }
+
+    @Override
+    public Optional<User> findById(Long userId) {
+        return jpaUserRepository.findById(userId)
+                .map(UserMapper::fromEntity);
     }
 
     private User saveOnConflictDoNothing(User user) {

@@ -32,12 +32,17 @@ public class SubscriptionEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
+    @ManyToOne
+    @JoinColumn(name = "referrer")
+    private UserEntity referrer;
+
     @Column(name = "created_datetime")
     private LocalDateTime createdDatetime = LocalDateTime.now();
 
-    public SubscriptionEntity(Long id, EventEntity event, UserEntity user) {
+    public SubscriptionEntity(Long id, EventEntity event, UserEntity user, UserEntity referrer) {
         this.id = id;
         this.event = event;
         this.user = user;
+        this.referrer = referrer;
     }
 }

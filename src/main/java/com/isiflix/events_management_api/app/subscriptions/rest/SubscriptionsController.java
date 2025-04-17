@@ -18,14 +18,15 @@ public class SubscriptionsController {
         this.createSubscriptionUseCase = createSubscriptionUseCase;
     }
 
-    @PostMapping("/{prettyName}")
+    @PostMapping({"/{prettyName}", "/{prettyName}/{referrerId}"})
     @ResponseStatus(HttpStatus.CREATED)
     public CreateSubscriptionResponse subscribe(
             @PathVariable String prettyName,
+            @PathVariable(required = false) Long referrerId,
             @Valid @RequestBody CreateSubscriptionRequest req
     ) {
         final var createSubscriptionDTO = new CreateSubscriptionDTO(prettyName, req.userName(), req.email());
-        SubscriptionDTO subscriptionDTO = createSubscriptionUseCase.createNewSubscription(createSubscriptionDTO);
+        SubscriptionDTO subscriptionDTO = createSubscriptionUseCase.createNewSubscription(createSubscriptionDTO, referrerId);
         return new CreateSubscriptionResponse(subscriptionDTO.id(), subscriptionDTO.designation());
     }
 }

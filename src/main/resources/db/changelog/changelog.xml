@@ -5,4 +5,10 @@
     <changeSet id="1" author="diogo"><sqlFile path="db/sql/V1__create_events_table.sql"/></changeSet>
     <changeSet id="2" author="diogo"><sqlFile path="db/sql/V2__create_users_table.sql"/></changeSet>
     <changeSet id="3" author="diogo"><sqlFile path="db/sql/V3__create_subscriptions_table.sql"/></changeSet>
+    <changeSet id="4" author="diogo">
+        <preConditions onFail="CONTINUE">
+            <not><columnExists tableName="ems_subscriptions" columnName="referrer" /></not>
+        </preConditions>
+        <sqlFile path="db/sql/V4__alter_subscriptions_table.sql" />
+    </changeSet>
 </databaseChangeLog>

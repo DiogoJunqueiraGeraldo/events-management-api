@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -39,20 +40,32 @@ public class CreateSubscriptionUseCase {
         this.subscriptionRepository = subscriptionRepository;
     }
 
-    public SubscriptionDTO createNewSubscription(CreateSubscriptionDTO dto) {
+    public SubscriptionDTO createNewSubscription(CreateSubscriptionDTO dto, Long referrerId) {
+        final var referrer = findReferrer(referrerId).orElse(null);
         final var event = findEvent(dto.prettyName());
         final var user = findUserOrCreate(dto.email(), dto.userName());
+        final var subscription = event.subscribe(user, referrer);
+        return persistAndCheckConstraints(subscription).toDTO();
+    }
 
+    private Subscription persistAndCheckConstraints(Subscription subscription) {
         try {
-            final var subscription = createNewSubscription(event, user);
-            return subscription.toDTO();
+            return subscriptionRepository.saveAndCheckConstraints(subscription);
         } catch (DataIntegrityViolationException e) {
             if (isSubscriptionConstraintViolation(e)) {
-                throwSubscriptionAlreadyExists(event, user);
+                throwSubscriptionAlreadyExists(subscription.event(), subscription.user());
             }
 
             throw e;
         }
+    }
+
+    private Optional<User> findReferrer(Long referrerId) {
+        if(referrerId == null) {
+            return Optional.empty();
+        }
+
+        return userRepository.findById(referrerId);
     }
 
     private void throwSubscriptionAlreadyExists(Event event, User user) {
@@ -69,11 +82,6 @@ public class CreateSubscriptionUseCase {
     private boolean isSubscriptionConstraintViolation(DataIntegrityViolationException dataIntegrityViolationException) {
         return dataIntegrityViolationException.getCause() instanceof ConstraintViolationException constraintViolationException
                 && Objects.equals(constraintViolationException.getConstraintName(), SUBSCRIPTION_UNIQUE_CONSTRAINT);
-    }
-
-    private Subscription createNewSubscription(Event event, User user) {
-        final var subscription = event.subscribe(user);
-        return subscriptionRepository.saveAndCheckConstraints(subscription);
     }
 
     private Event findEvent(String prettyName) {

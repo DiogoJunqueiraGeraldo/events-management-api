@@ -24,6 +24,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -244,5 +245,69 @@ public class CreateSubscriptionIntegrationTest {
                 .getContentAsString();
 
         mockMvc.perform(request).andExpect(status().isConflict());
+    }
+
+    @Test
+    @DisplayName("Integration Test - Can't Refer Itself")
+    public void shouldNotBeAbleToReferItself() throws Exception {
+        final var createSubscriptionRequest = new CreateSubscriptionRequest("Foo Bar", "foo@bar.com");
+        final var requestBody = objectMapper.writeValueAsString(createSubscriptionRequest);
+        final var request = post("/subscriptions/{prettyName}", EXISTING_EVENT)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody);
+
+        mockMvc.perform(request)
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        Optional<UserEntity> foundItself = jpaUserRepository.findByEmail("foo@bar.com");
+        assertThat(foundItself).isPresent();
+
+        final var itself = foundItself.get();
+        final var referralRequest = post("/subscriptions/{prettyName}/{referrerId}",
+                EXISTING_EVENT, itself.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody);
+
+        final var responseBody = mockMvc.perform(referralRequest)
+                .andExpect(status().isConflict())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        final var response = objectMapper.readValue(responseBody, StandardErrorResponse.class);
+        assertThat(response.code()).isEqualTo(ViolationCode.CONFLICT_CANT_REFER_ITSELF.toString());
+    }
+
+    @Test
+    @DisplayName("Integration Test - Subscribe with Referral")
+    public void shouldCreateSubscriptionWithReferral() throws Exception {
+        UserEntity referrer = new UserEntity(null, "John Doe", "john@doe.com");
+        jpaUserRepository.saveAndFlush(referrer);
+
+        final var createSubscriptionRequest = new CreateSubscriptionRequest("Foo Bar", "foo@bar.com");
+        final var requestBody = objectMapper.writeValueAsString(createSubscriptionRequest);
+        final var request = post("/subscriptions/{prettyName}/{referrerId}",
+                EXISTING_EVENT, referrer.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody);
+
+        final var responseBody = mockMvc.perform(request)
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        final var response = objectMapper.readValue(responseBody, CreateSubscriptionResponse.class);
+
+        final var subscriptionFound = jpaSubscriptionRepository.findById(response.subscriptionId());
+        assertThat(subscriptionFound).isPresent();
+        final var subscription = subscriptionFound.get();
+
+        assertThat(subscription.getReferrer()).isNotNull();
+        assertThat(subscription.getReferrer().getId()).isEqualTo(referrer.getId());
+        assertThat(subscription.getReferrer().getEmail()).isEqualTo(referrer.getEmail());
     }
 }

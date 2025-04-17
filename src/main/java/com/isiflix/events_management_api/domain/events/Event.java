@@ -76,8 +76,8 @@ public class Event {
         );
     }
 
-    public Subscription subscribe(User user) {
-        return new Subscription(null, this, user);
+    public Subscription subscribe(User user, User referrer) {
+        return new Subscription(null, this, user, referrer);
     }
 
     public void setId(Long id) {

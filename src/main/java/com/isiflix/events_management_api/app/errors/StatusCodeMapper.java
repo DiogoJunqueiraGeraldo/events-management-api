@@ -20,8 +20,8 @@ public class StatusCodeMapper {
      */
     public int of(ViolationCode violationCode) {
         final var statusCode = switch (violationCode) {
-            case CONFLICT_PRETTY_NAME_ALREADY_EXISTS -> HttpStatus.CONFLICT;
-            case CONFLICT_USER_ALREADY_SUBSCRIBED_TO_EVENT -> HttpStatus.CONFLICT;
+            case CONFLICT_PRETTY_NAME_ALREADY_EXISTS, CONFLICT_CANT_REFER_ITSELF,
+                 CONFLICT_USER_ALREADY_SUBSCRIBED_TO_EVENT -> HttpStatus.CONFLICT;
             case CANT_SUBSCRIBE_TO_NON_EXISTING_EVENT -> HttpStatus.NOT_FOUND;
             // don't you dare add a default clause
         };

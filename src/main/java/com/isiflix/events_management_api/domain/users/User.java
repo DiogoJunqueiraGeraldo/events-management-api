@@ -29,7 +29,21 @@ public class User {
         return email;
     }
 
-    public Object getId() {
+    public Long getId() {
         return id;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        User user = (User) o;
+
+        if (id != null && !id.equals(user.id)) return false;
+
+        // Both are null, can't affirm that they're equal
+        if (email == null && user.email == null) return false;
+        return email != null && email.equals(user.email);
     }
 }
