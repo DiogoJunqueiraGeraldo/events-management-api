@@ -1,0 +1,224 @@
+{
+	"info": {
+		"name": "events-management-api",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Events",
+			"item": [
+				{
+					"name": "Create Event",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Store last pretty name\", function () {",
+									"    const response = pm.response.json()",
+									"    pm.collectionVariables.set(\"prettyName\", response.prettyName)",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{$randomFullName}} Conference\",\n    \"location\": \"Online\",\n    \"price\": {{$randomPrice}},\n    \"startDate\": \"2026-04-03\",\n    \"endDate\": \"2026-04-03\",\n    \"startTime\": \"19:00:00\",\n    \"endTime\": \"21:00:00\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/events",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"events"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Events",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/events?page=1&size=12",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"events"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "size",
+									"value": "12"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Find by Pretty Name",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/events/{{prettyName}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"events",
+								"{{prettyName}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Subscriptions",
+			"item": [
+				{
+					"name": "Subscribe",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Store user id\", function () {",
+									"    const { designation } = pm.response.json();",
+									"    const userId = designation.split('/').pop();",
+									"    pm.collectionVariables.set(\"userId\", userId);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userName\": \"{{$randomUserName}}\",\n    \"email\": \"{{$randomEmail}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/subscriptions/{{prettyName}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"subscriptions",
+								"{{prettyName}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Referral",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userName\": \"{{$randomUserName}}\",\n    \"email\": \"{{$randomEmail}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/subscriptions/{{prettyName}}/{{userId}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"subscriptions",
+								"{{prettyName}}",
+								"{{userId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Podium",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/subscriptions/{{prettyName}}/ranking",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"subscriptions",
+								"{{prettyName}}",
+								"ranking"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Ranking",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/subscriptions/{{prettyName}}/ranking/52",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"subscriptions",
+								"{{prettyName}}",
+								"ranking",
+								"52"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "prettyName",
+			"value": ""
+		},
+		{
+			"key": "userId",
+			"value": ""
+		}
+	]
+}

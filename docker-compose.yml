@@ -1,7 +1,6 @@
 version: '3.9'
 
 services:
-
   db:
     image: postgres
     restart: always
@@ -17,3 +16,16 @@ services:
       POSTGRES_DB: events
     ports:
       - "5432:5432"
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/events
+      DB_USER: user
+      DB_PASS: password
+    ports:
+      - "8080:8080"
