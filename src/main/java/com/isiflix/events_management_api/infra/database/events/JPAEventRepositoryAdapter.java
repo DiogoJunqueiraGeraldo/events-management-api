@@ -22,9 +22,9 @@ public class JPAEventRepositoryAdapter implements EventRepository {
     }
 
     @Override
-    public Event save(Event event) {
+    public Event saveAndCheckConstraints(Event event) {
         final var entity = EventMapper.toEntity(event);
-        this.jpaEventRepository.save(entity);
+        this.jpaEventRepository.saveAndFlush(entity);
         return EventMapper.fromEntity(entity);
     }
 

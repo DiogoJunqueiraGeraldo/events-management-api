@@ -18,7 +18,7 @@ public class FindEventUseCase {
         this.eventRepository = eventRepository;
     }
 
-    public Optional<EventDTO> find(String prettyName) {
+    public Optional<EventDTO> findByPrettyName(String prettyName) {
         return eventRepository.findByPrettyName(PrettyNameVO.of(prettyName))
                 .map(Event::toDTO);
     }

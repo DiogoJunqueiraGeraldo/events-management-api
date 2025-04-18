@@ -1,6 +1,6 @@
 package com.isiflix.events_management_api.infra.database.users;
 
-import com.isiflix.events_management_api.app.subscriptions.dtos.UserDTO;
+import com.isiflix.events_management_api.app.users.dtos.UserDTO;
 import com.isiflix.events_management_api.domain.users.User;
 
 public class UserMapper {

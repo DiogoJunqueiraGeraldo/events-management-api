@@ -2,8 +2,8 @@ package com.isiflix.events_management_api.integration.events;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.isiflix.events_management_api.app.errors.StandardErrorResponse;
-import com.isiflix.events_management_api.app.events.rest.CreateEventRequest;
-import com.isiflix.events_management_api.app.events.rest.EventResponse;
+import com.isiflix.events_management_api.app.events.rest.requests.CreateEventRequest;
+import com.isiflix.events_management_api.app.events.rest.responses.EventResponse;
 import com.isiflix.events_management_api.infra.database.events.JPAEventRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;

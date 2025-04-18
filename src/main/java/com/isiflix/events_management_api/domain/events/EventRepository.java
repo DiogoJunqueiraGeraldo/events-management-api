@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface EventRepository {
-    Event save(Event event);
+    Event saveAndCheckConstraints(Event event);
 
     List<Event> list(int page, int size);
 

@@ -1,4 +1,4 @@
-package com.isiflix.events_management_api.app.subscriptions.rest;
+package com.isiflix.events_management_api.app.subscriptions.rest.requests;
 
 import jakarta.validation.constraints.NotBlank;
 

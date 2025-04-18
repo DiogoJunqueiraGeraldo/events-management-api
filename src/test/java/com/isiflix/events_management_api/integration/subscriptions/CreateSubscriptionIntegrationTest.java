@@ -2,8 +2,8 @@ package com.isiflix.events_management_api.integration.subscriptions;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.isiflix.events_management_api.app.errors.StandardErrorResponse;
-import com.isiflix.events_management_api.app.subscriptions.rest.CreateSubscriptionRequest;
-import com.isiflix.events_management_api.app.subscriptions.rest.CreateSubscriptionResponse;
+import com.isiflix.events_management_api.app.subscriptions.rest.requests.CreateSubscriptionRequest;
+import com.isiflix.events_management_api.app.subscriptions.rest.responses.CreateSubscriptionResponse;
 import com.isiflix.events_management_api.domain.errors.ViolationCode;
 import com.isiflix.events_management_api.infra.database.events.EventEntity;
 import com.isiflix.events_management_api.infra.database.events.JPAEventRepository;
@@ -12,7 +12,6 @@ import com.isiflix.events_management_api.infra.database.users.JPAUserRepository;
 import com.isiflix.events_management_api.infra.database.users.UserEntity;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
@@ -33,7 +32,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Testcontainers
 @SpringBootTest
 @AutoConfigureMockMvc
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class CreateSubscriptionIntegrationTest {
     @Container
     @ServiceConnection

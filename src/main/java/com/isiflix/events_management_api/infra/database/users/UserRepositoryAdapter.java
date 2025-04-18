@@ -22,10 +22,9 @@ public class UserRepositoryAdapter implements UserRepository {
     }
 
     @Override
-    public User findOrSave(User user) {
-        return jpaUserRepository.findByEmail(user.getEmail())
-            .map(UserMapper::fromEntity)
-            .orElseGet(() -> this.saveOnConflictDoNothing(user));
+    public Optional<User> findByEmail(String email) {
+        return jpaUserRepository.findByEmail(email)
+            .map(UserMapper::fromEntity);
     }
 
     @Override
@@ -34,7 +33,8 @@ public class UserRepositoryAdapter implements UserRepository {
                 .map(UserMapper::fromEntity);
     }
 
-    private User saveOnConflictDoNothing(User user) {
+    @Override
+    public User saveIfNotExists(User user) {
         UserEntity entity = UserMapper.toEntity(user);
 
         try {

@@ -2,6 +2,9 @@ package com.isiflix.events_management_api.app.events.rest;
 
 import com.isiflix.events_management_api.app.events.*;
 import com.isiflix.events_management_api.app.events.dtos.CreateEventDTO;
+import com.isiflix.events_management_api.app.events.rest.requests.CreateEventRequest;
+import com.isiflix.events_management_api.app.events.rest.responses.EventPaginationResponse;
+import com.isiflix.events_management_api.app.events.rest.responses.EventResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,7 +61,7 @@ public class EventsController {
 
     @GetMapping("/{prettyName}")
     public ResponseEntity<EventResponse> findEvent(@PathVariable String prettyName) throws NoResourceFoundException {
-        final var event = findEventUseCase.find(prettyName);
+        final var event = findEventUseCase.findByPrettyName(prettyName);
         return event
                 .map(EventResponse::of)
                 .map(ResponseEntity::ok)

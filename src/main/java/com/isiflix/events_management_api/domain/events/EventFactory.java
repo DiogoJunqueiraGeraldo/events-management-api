@@ -1,6 +1,7 @@
 package com.isiflix.events_management_api.domain.events;
 
 import com.isiflix.events_management_api.app.events.dtos.CreateEventDTO;
+import com.isiflix.events_management_api.app.events.dtos.EventDTO;
 import com.isiflix.events_management_api.domain.events.vos.EventPeriodVO;
 import com.isiflix.events_management_api.domain.events.vos.PrettyNameVO;
 
@@ -29,13 +30,13 @@ public class EventFactory {
      * avoiding any dependency on external DTOs. It ensures that the reconstructed event
      * complies with all domain invariants.
      *
-     * @param id         the event's unique identifier.
-     * @param name       the event name.
-     * @param prettyName the human-friendly event name.
-     * @param location   the event location.
-     * @param price      the event price.
-     * @param startDateTime  the event start date and time.
-     * @param endDateTime    the event end date and time.
+     * @param id            the event's unique identifier.
+     * @param name          the event name.
+     * @param prettyName    the human-friendly event name.
+     * @param location      the event location.
+     * @param price         the event price.
+     * @param startDateTime the event start date and time.
+     * @param endDateTime   the event end date and time.
      * @return an {@link Event} instance reconstructed from the provided raw values.
      * @throws IllegalArgumentException if any provided value violates domain rules.
      */
@@ -53,6 +54,18 @@ public class EventFactory {
                 location,
                 price,
                 new EventPeriodVO(startDateTime, endDateTime)
+        );
+    }
+
+    public static Event of(EventDTO eventDTO) {
+        return fromRaw(
+                eventDTO.id(),
+                eventDTO.name(),
+                eventDTO.prettyName(),
+                eventDTO.location(),
+                eventDTO.price(),
+                eventDTO.startDateTime(),
+                eventDTO.endDateTime()
         );
     }
 }

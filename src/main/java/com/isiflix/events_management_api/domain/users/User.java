@@ -1,6 +1,6 @@
 package com.isiflix.events_management_api.domain.users;
 
-import com.isiflix.events_management_api.app.subscriptions.dtos.UserDTO;
+import com.isiflix.events_management_api.app.users.dtos.UserDTO;
 
 public class User {
     private final Long id;
@@ -31,6 +31,10 @@ public class User {
 
     public Long getId() {
         return id;
+    }
+
+    public String getName() {
+        return name;
     }
 
     @Override

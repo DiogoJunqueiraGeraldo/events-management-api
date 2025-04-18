@@ -1,4 +1,4 @@
-package com.isiflix.events_management_api.app.events.rest;
+package com.isiflix.events_management_api.app.events.rest.requests;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotNull;

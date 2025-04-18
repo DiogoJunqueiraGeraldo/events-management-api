@@ -1,16 +1,16 @@
 package com.isiflix.events_management_api.app.subscriptions;
 
+import com.isiflix.events_management_api.app.events.FindEventUseCase;
 import com.isiflix.events_management_api.app.subscriptions.dtos.CreateSubscriptionDTO;
 import com.isiflix.events_management_api.app.subscriptions.dtos.SubscriptionDTO;
+import com.isiflix.events_management_api.app.users.CreateUserUseCase;
+import com.isiflix.events_management_api.app.users.FindUserUseCase;
+import com.isiflix.events_management_api.app.users.dtos.CreateUserDTO;
 import com.isiflix.events_management_api.domain.errors.BusinessRuleViolationException;
 import com.isiflix.events_management_api.domain.errors.ViolationCode;
-import com.isiflix.events_management_api.domain.events.Event;
-import com.isiflix.events_management_api.domain.events.EventRepository;
-import com.isiflix.events_management_api.domain.events.Subscription;
-import com.isiflix.events_management_api.domain.events.vos.PrettyNameVO;
-import com.isiflix.events_management_api.domain.events.SubscriptionRepository;
+import com.isiflix.events_management_api.domain.events.*;
 import com.isiflix.events_management_api.domain.users.User;
-import com.isiflix.events_management_api.domain.users.UserRepository;
+import com.isiflix.events_management_api.domain.users.UserFactory;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -25,18 +25,22 @@ import java.util.Optional;
 @Transactional
 public class CreateSubscriptionUseCase {
     private final static String SUBSCRIPTION_UNIQUE_CONSTRAINT = "ems_subscriptions_event_id_user_id_key";
-    private final EventRepository eventRepository;
-    private final UserRepository userRepository;
+    private final FindEventUseCase findEventUseCase;
+    private final FindUserUseCase findUserUseCase;
+    private final CreateUserUseCase createUserUseCase;
+
     private final SubscriptionRepository subscriptionRepository;
 
     @Autowired
     public CreateSubscriptionUseCase(
-            EventRepository eventRepository,
-            UserRepository userRepository,
+            FindEventUseCase findEventUseCase,
+            FindUserUseCase findUserUseCase,
+            CreateUserUseCase createUserUseCase,
             SubscriptionRepository subscriptionRepository
     ) {
-        this.eventRepository = eventRepository;
-        this.userRepository = userRepository;
+        this.findEventUseCase = findEventUseCase;
+        this.findUserUseCase = findUserUseCase;
+        this.createUserUseCase = createUserUseCase;
         this.subscriptionRepository = subscriptionRepository;
     }
 
@@ -65,7 +69,7 @@ public class CreateSubscriptionUseCase {
             return Optional.empty();
         }
 
-        return userRepository.findById(referrerId);
+        return findUserUseCase.findUserById(referrerId).map(UserFactory::of);
     }
 
     private void throwSubscriptionAlreadyExists(Event event, User user) {
@@ -85,9 +89,9 @@ public class CreateSubscriptionUseCase {
     }
 
     private Event findEvent(String prettyName) {
-        final var prettyNameVo = PrettyNameVO.of(prettyName);
-        return eventRepository
-                .findByPrettyName(prettyNameVo)
+        return findEventUseCase
+                .findByPrettyName(prettyName)
+                .map(EventFactory::of)
                 .orElseThrow(() -> new BusinessRuleViolationException(
                         ViolationCode.CANT_SUBSCRIBE_TO_NON_EXISTING_EVENT,
                         "Event with pretty name %s not found".formatted(prettyName),
@@ -96,7 +100,12 @@ public class CreateSubscriptionUseCase {
     }
 
     private User findUserOrCreate(String email, String userName) {
-        final var user = new User(null, userName, email);
-        return userRepository.findOrSave(user);
+        return findUserUseCase.findByEmail(email)
+                .map(UserFactory::of)
+                .orElseGet(() -> {
+                    final var createUserDTO = new CreateUserDTO(userName, email);
+                    final var dto = createUserUseCase.createUser(createUserDTO);
+                    return UserFactory.of(dto);
+                });
     }
 }

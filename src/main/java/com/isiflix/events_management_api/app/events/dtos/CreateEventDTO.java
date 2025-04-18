@@ -1,6 +1,6 @@
 package com.isiflix.events_management_api.app.events.dtos;
 
-import com.isiflix.events_management_api.app.events.rest.CreateEventRequest;
+import com.isiflix.events_management_api.app.events.rest.requests.CreateEventRequest;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

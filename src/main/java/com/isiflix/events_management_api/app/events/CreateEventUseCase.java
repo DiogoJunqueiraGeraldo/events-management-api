@@ -12,11 +12,13 @@ import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 import java.util.Objects;
 
 @Service
+@Transactional
 public class CreateEventUseCase {
     final static String PRETTY_NAME_UNIQUE_CONSTRAINT = "ems_events_pretty_name_key";
     private final EventRepository eventRepository;
@@ -30,12 +32,9 @@ public class CreateEventUseCase {
         Event event = EventFactory.create(createEventDTO);
 
         try {
-            Event persistedEvent = this.eventRepository.save(event);
+            Event persistedEvent = this.eventRepository.saveAndCheckConstraints(event);
             return persistedEvent.toDTO();
         } catch (DataIntegrityViolationException e) {
-            // @warn: this works because the use case is *not* transactional
-            // if that changes, you'll either need to handle this exception at the global level
-            // or update the repository adapter to flush in order to trigger constraint checks
             if (isPrettyNameConstraintViolation(e)) {
                 throwPrettyNameAlreadyExists(event.getPrettyName());
             }

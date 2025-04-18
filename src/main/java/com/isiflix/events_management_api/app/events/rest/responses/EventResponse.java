@@ -1,4 +1,4 @@
-package com.isiflix.events_management_api.app.events.rest;
+package com.isiflix.events_management_api.app.events.rest.responses;
 
 import com.isiflix.events_management_api.app.events.dtos.EventDTO;
 
