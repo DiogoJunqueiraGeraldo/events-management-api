@@ -30,7 +30,7 @@ public class JPAEventRepositoryAdapter implements EventRepository {
 
     @Override
     public List<Event> list(int page, int size) {
-        Pageable pageable = PageRequest.of(page -1, size, Sort.by("createdDatetime").descending());
+        Pageable pageable = PageRequest.of(page -1, size, Sort.by("createdDatetime", "id").descending());
         return jpaEventRepository.findAll(pageable)
                 .map(EventMapper::fromEntity)
                 .toList();
