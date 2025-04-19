@@ -1,4 +1,4 @@
-create sequence ems_events_id_seq
+create sequence if not exists ems_events_id_seq
     start with 1
     increment by 50
     minvalue 1
