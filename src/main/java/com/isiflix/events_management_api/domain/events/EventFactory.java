@@ -2,8 +2,8 @@ package com.isiflix.events_management_api.domain.events;
 
 import com.isiflix.events_management_api.app.events.dtos.CreateEventDTO;
 import com.isiflix.events_management_api.app.events.dtos.EventDTO;
-import com.isiflix.events_management_api.domain.events.vos.EventPeriodVO;
-import com.isiflix.events_management_api.domain.events.vos.PrettyNameVO;
+import com.isiflix.events_management_api.domain.events.vos.EventPeriod;
+import com.isiflix.events_management_api.domain.events.vos.EventPrettyName;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -15,7 +15,7 @@ public class EventFactory {
                 createEventDTO.name(),
                 createEventDTO.location(),
                 createEventDTO.price(),
-                new EventPeriodVO(
+                new EventPeriod(
                         createEventDTO.startDateTime(),
                         createEventDTO.endDateTime()
                 )
@@ -50,10 +50,10 @@ public class EventFactory {
         return new Event(
                 id,
                 name,
-                PrettyNameVO.of(prettyName),
+                EventPrettyName.of(prettyName),
                 location,
                 price,
-                new EventPeriodVO(startDateTime, endDateTime)
+                new EventPeriod(startDateTime, endDateTime)
         );
     }
 

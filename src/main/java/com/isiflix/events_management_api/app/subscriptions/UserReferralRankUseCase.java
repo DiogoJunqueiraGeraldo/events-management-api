@@ -5,7 +5,7 @@ import com.isiflix.events_management_api.app.users.dtos.UserDTO;
 import com.isiflix.events_management_api.app.subscriptions.dtos.UserReferralRankDTO;
 import com.isiflix.events_management_api.domain.events.EventFactory;
 import com.isiflix.events_management_api.domain.events.SubscriptionRepository;
-import com.isiflix.events_management_api.domain.users.User;
+import com.isiflix.events_management_api.domain.users.UserFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +20,7 @@ public class UserReferralRankUseCase {
 
     public UserReferralRankDTO getUserReferralRank(EventDTO eventDTO, UserDTO userDTO) {
         final var event = EventFactory.of(eventDTO);
-        final var user = new User(userDTO.id(), userDTO.name(), userDTO.email());
+        final var user = UserFactory.of(userDTO);
         final var rankVo = subscriptionRepository.calculateRankForUser(event, user);
         return new UserReferralRankDTO(rankVo.position(), rankVo.referralsCounter(), userDTO);
     }

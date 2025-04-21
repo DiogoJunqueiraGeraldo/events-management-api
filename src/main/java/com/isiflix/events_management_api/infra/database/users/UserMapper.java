@@ -2,6 +2,7 @@ package com.isiflix.events_management_api.infra.database.users;
 
 import com.isiflix.events_management_api.app.users.dtos.UserDTO;
 import com.isiflix.events_management_api.domain.users.User;
+import com.isiflix.events_management_api.domain.users.UserFactory;
 
 public class UserMapper {
     public static UserEntity toEntity(User user) {
@@ -10,6 +11,6 @@ public class UserMapper {
     }
 
     public static User fromEntity(UserEntity entity) {
-        return new User(entity.getId(), entity.getName(), entity.getEmail());
+        return UserFactory.fromRaw(entity.getId(), entity.getName(), entity.getEmail());
     }
 }

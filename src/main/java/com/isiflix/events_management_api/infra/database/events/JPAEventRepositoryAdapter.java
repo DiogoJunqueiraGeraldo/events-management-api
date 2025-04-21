@@ -2,7 +2,7 @@ package com.isiflix.events_management_api.infra.database.events;
 
 import com.isiflix.events_management_api.domain.events.Event;
 import com.isiflix.events_management_api.domain.events.EventRepository;
-import com.isiflix.events_management_api.domain.events.vos.PrettyNameVO;
+import com.isiflix.events_management_api.domain.events.vos.EventPrettyName;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -37,8 +37,8 @@ public class JPAEventRepositoryAdapter implements EventRepository {
     }
 
     @Override
-    public Optional<Event> findByPrettyName(PrettyNameVO prettyName) {
-        return jpaEventRepository.findByPrettyName(prettyName.prettyName())
+    public Optional<Event> findByPrettyName(EventPrettyName eventPrettyName) {
+        return jpaEventRepository.findByPrettyName(eventPrettyName.toString())
                 .map(EventMapper::fromEntity);
     }
 }

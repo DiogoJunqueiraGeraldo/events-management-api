@@ -9,11 +9,11 @@ import java.time.LocalDateTime;
  * This value object ensures that an event has a valid start and end time,
  * with constraints on minimum and maximum duration.
  */
-public record EventPeriodVO(LocalDateTime startDateTime, LocalDateTime endDateTime) {
+public record EventPeriod(LocalDateTime startDateTime, LocalDateTime endDateTime) {
     public static final long MIN_DURATION_IN_MINUTES = 1;
     public static final long MAX_DURATION_IN_MINUTES = Duration.ofDays(365).toMinutes();
 
-    public EventPeriodVO(LocalDateTime startDateTime, LocalDateTime endDateTime) {
+    public EventPeriod(LocalDateTime startDateTime, LocalDateTime endDateTime) {
         this.startDateTime = startDateTime;
         this.endDateTime = endDateTime;
         validateRequirements();

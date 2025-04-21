@@ -3,7 +3,7 @@ package com.isiflix.events_management_api.app.events;
 import com.isiflix.events_management_api.app.events.dtos.EventDTO;
 import com.isiflix.events_management_api.domain.events.Event;
 import com.isiflix.events_management_api.domain.events.EventRepository;
-import com.isiflix.events_management_api.domain.events.vos.PrettyNameVO;
+import com.isiflix.events_management_api.domain.events.vos.EventPrettyName;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +19,7 @@ public class FindEventUseCase {
     }
 
     public Optional<EventDTO> findByPrettyName(String prettyName) {
-        return eventRepository.findByPrettyName(PrettyNameVO.of(prettyName))
+        return eventRepository.findByPrettyName(EventPrettyName.of(prettyName))
                 .map(Event::toDTO);
     }
 }

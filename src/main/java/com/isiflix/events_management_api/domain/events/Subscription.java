@@ -37,7 +37,7 @@ public record Subscription(Long id, Event event, User user, User referrer) {
 
     private String buildDesignation() {
         return "https://devstage.com/%s/%d".formatted(
-                event.getPrettyName().prettyName(),
+                event.getPrettyName().toString(),
                 user.getId()
         );
     }

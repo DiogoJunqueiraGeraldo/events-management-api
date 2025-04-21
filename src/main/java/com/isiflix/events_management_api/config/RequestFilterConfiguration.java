@@ -1,4 +1,4 @@
-package com.isiflix.events_management_api.app.config;
+package com.isiflix.events_management_api.config;
 
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;

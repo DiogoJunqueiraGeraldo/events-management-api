@@ -3,8 +3,8 @@ package com.isiflix.events_management_api.infra.database.subscriptions;
 import com.isiflix.events_management_api.domain.events.Event;
 import com.isiflix.events_management_api.domain.events.Subscription;
 import com.isiflix.events_management_api.domain.events.SubscriptionRepository;
-import com.isiflix.events_management_api.domain.events.vos.ReferralPodiumVO;
-import com.isiflix.events_management_api.domain.events.vos.ReferralRankVO;
+import com.isiflix.events_management_api.domain.events.vos.EventReferralPodium;
+import com.isiflix.events_management_api.domain.events.vos.EventReferralRank;
 import com.isiflix.events_management_api.domain.users.User;
 import com.isiflix.events_management_api.infra.database.users.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +30,8 @@ public class JPASubscriptionRepositoryAdapter implements SubscriptionRepository 
     }
 
     @Override
-    public ReferralPodiumVO calculatePodiumForEvent(Event event, int podiumSize) {
-        return new ReferralPodiumVO(jpaSubscriptionRepository
+    public EventReferralPodium calculatePodiumForEvent(Event event, int podiumSize) {
+        return new EventReferralPodium(jpaSubscriptionRepository
                 .countReferralsForEvent(
                         event.getId(),
                         podiumSize
@@ -45,8 +45,8 @@ public class JPASubscriptionRepositoryAdapter implements SubscriptionRepository 
     }
 
     @Override
-    public ReferralRankVO calculateRankForUser(Event event, User user) {
+    public EventReferralRank calculateRankForUser(Event event, User user) {
         final var rank = jpaSubscriptionRepository.rankPositionForEventAndUser(event.getId(), user.getId());
-        return new ReferralRankVO(event, user, rank.rankPosition(), rank.referralCounter());
+        return new EventReferralRank(event, user, rank.rankPosition(), rank.referralCounter());
     }
 }

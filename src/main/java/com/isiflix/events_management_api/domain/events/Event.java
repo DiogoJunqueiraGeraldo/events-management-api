@@ -1,8 +1,8 @@
 package com.isiflix.events_management_api.domain.events;
 
 import com.isiflix.events_management_api.app.events.dtos.EventDTO;
-import com.isiflix.events_management_api.domain.events.vos.EventPeriodVO;
-import com.isiflix.events_management_api.domain.events.vos.PrettyNameVO;
+import com.isiflix.events_management_api.domain.events.vos.EventPeriod;
+import com.isiflix.events_management_api.domain.events.vos.EventPrettyName;
 import com.isiflix.events_management_api.domain.users.User;
 
 import java.math.BigDecimal;
@@ -10,10 +10,10 @@ import java.math.BigDecimal;
 public class Event {
     private Long id;
     private String name;
-    private PrettyNameVO prettyName;
+    private EventPrettyName eventPrettyName;
     private String location;
     private BigDecimal price;
-    private EventPeriodVO period;
+    private EventPeriod period;
 
     /**
      * New Instance Constructor
@@ -25,13 +25,13 @@ public class Event {
      * @param price event price, it can be for free, but don't try to get smart about it
      * @param period event period, it should be consistence, otherwise it won't instantiate
      */
-    protected Event(String name, String location, BigDecimal price, EventPeriodVO period) {
+    protected Event(String name, String location, BigDecimal price, EventPeriod period) {
         setName(name);
         setLocation(location);
         setPrice(price);
         setPeriod(period);
 
-        generatePrettyNameFromName();
+        this.eventPrettyName = EventPrettyName.of(name);
     }
 
     /**
@@ -42,15 +42,15 @@ public class Event {
      *
      * @param id event unique identifier
      * @param name event name, stored on the database
-     * @param prettyName event prettyName, stored on the database
+     * @param eventPrettyName event prettyName, stored on the database
      * @param location event location, stored on the database
      * @param price event price, stored on the database
      * @param period event period, stored on the database
      */
-    protected Event(Long id, String name, PrettyNameVO prettyName, String location, BigDecimal price, EventPeriodVO period) {
+    protected Event(Long id, String name, EventPrettyName eventPrettyName, String location, BigDecimal price, EventPeriod period) {
         setId(id);
         setName(name);
-        setPrettyName(prettyName);
+        setPrettyName(eventPrettyName);
         setLocation(location);
         setPrice(price);
         setPeriod(period);
@@ -68,7 +68,7 @@ public class Event {
         return new EventDTO(
                 this.id,
                 this.name,
-                this.prettyName.prettyName(),
+                this.eventPrettyName.toString(),
                 this.location,
                 this.price,
                 this.period.startDateTime(),
@@ -82,7 +82,7 @@ public class Event {
 
     public void setId(Long id) {
         if(id == null || id < 0) {
-            throw new IllegalArgumentException("Event 'id' cannot be null or negative");
+            throw new IllegalArgumentException("Event 'id' should not be null or negative");
         }
 
         if(this.id != null) {
@@ -92,20 +92,12 @@ public class Event {
         this.id = id;
     }
 
-    private void setPrettyName(PrettyNameVO prettyName) {
-        if(prettyName == null) {
-            throw new IllegalArgumentException("Event 'prettyName' cannot be null");
+    private void setPrettyName(EventPrettyName eventPrettyName) {
+        if(eventPrettyName == null) {
+            throw new IllegalArgumentException("Event 'prettyName' should not be null");
         }
 
-        this.prettyName = prettyName;
-    }
-
-    private void generatePrettyNameFromName() {
-        if (name == null || name.isBlank()) {
-            throw new IllegalArgumentException("Event 'name' should not be null or blank");
-        }
-
-        this.prettyName = PrettyNameVO.of(name);
+        this.eventPrettyName = eventPrettyName;
     }
 
     private void setName(String name) {
@@ -125,21 +117,21 @@ public class Event {
     }
 
     private void setPrice(BigDecimal price) {
-        if (BigDecimal.ZERO.compareTo(price) > 0) {
-            throw new IllegalArgumentException("Event 'price' should not be negative");
+        if (price == null || BigDecimal.ZERO.compareTo(price) > 0) {
+            throw new IllegalArgumentException("Event 'price' should not be negative or null");
         }
 
         this.price = price;
     }
 
-    private void setPeriod(EventPeriodVO period) {
+    private void setPeriod(EventPeriod period) {
         if (period == null) {
-            throw new IllegalArgumentException("Event 'period' be provided");
+            throw new IllegalArgumentException("Event 'period' should not be null");
         }
 
         this.period = period;
     }
 
     public Long getId() { return this.id; }
-    public PrettyNameVO getPrettyName() { return this.prettyName; }
+    public EventPrettyName getPrettyName() { return this.eventPrettyName; }
 }

@@ -77,7 +77,7 @@ public class CreateSubscriptionUseCase {
                 ViolationCode.CONFLICT_USER_ALREADY_SUBSCRIBED_TO_EVENT,
                 "Can't subscribe twice to same event",
                 Map.of(
-                        "event", event.getPrettyName().prettyName(),
+                        "event", event.getPrettyName().toString(),
                         "user", user.getEmail()
                 )
         );

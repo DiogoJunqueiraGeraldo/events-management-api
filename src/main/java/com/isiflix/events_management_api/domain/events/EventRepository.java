@@ -1,6 +1,6 @@
 package com.isiflix.events_management_api.domain.events;
 
-import com.isiflix.events_management_api.domain.events.vos.PrettyNameVO;
+import com.isiflix.events_management_api.domain.events.vos.EventPrettyName;
 
 import java.util.List;
 import java.util.Optional;
@@ -10,5 +10,5 @@ public interface EventRepository {
 
     List<Event> list(int page, int size);
 
-    Optional<Event> findByPrettyName(PrettyNameVO prettyName);
+    Optional<Event> findByPrettyName(EventPrettyName eventPrettyName);
 }
