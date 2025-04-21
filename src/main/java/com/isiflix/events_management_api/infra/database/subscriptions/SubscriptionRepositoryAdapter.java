@@ -14,11 +14,11 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Repository
-public class JPASubscriptionRepositoryAdapter implements SubscriptionRepository {
+public class SubscriptionRepositoryAdapter implements SubscriptionRepository {
     private final JPASubscriptionRepository jpaSubscriptionRepository;
 
     @Autowired
-    public JPASubscriptionRepositoryAdapter(JPASubscriptionRepository jpaSubscriptionRepository) {
+    public SubscriptionRepositoryAdapter(JPASubscriptionRepository jpaSubscriptionRepository) {
         this.jpaSubscriptionRepository = jpaSubscriptionRepository;
     }
 

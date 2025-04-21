@@ -13,11 +13,11 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class JPAEventRepositoryAdapter implements EventRepository {
+public class EventRepositoryAdapter implements EventRepository {
     private final JPAEventRepository jpaEventRepository;
 
     @Autowired
-    public JPAEventRepositoryAdapter(JPAEventRepository jpaEventRepository) {
+    public EventRepositoryAdapter(JPAEventRepository jpaEventRepository) {
         this.jpaEventRepository = jpaEventRepository;
     }
 
