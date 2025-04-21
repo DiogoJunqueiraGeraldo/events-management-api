@@ -4,6 +4,7 @@ import com.isiflix.events_management_api.app.events.dtos.EventDTO;
 import com.isiflix.events_management_api.domain.events.vos.EventPeriod;
 import com.isiflix.events_management_api.domain.events.vos.EventPeriodTest;
 import com.isiflix.events_management_api.domain.events.vos.EventPrettyName;
+import com.isiflix.events_management_api.domain.users.UserFactory;
 import lombok.Builder;
 import org.junit.jupiter.api.Test;
 
@@ -79,6 +80,34 @@ public class EventTest {
         );
 
         assertThat(event.toDTO()).isEqualTo(dto);
+    }
+
+    @Test
+    public void shouldSubscribeUserWithoutReferrer() {
+        final var event = EventBuilder.builder().build().newEvent();
+        final var user = UserFactory.fromRaw(1L, "john doe", "john@doe.com");
+
+        final var subscription = event.subscribe(user, null);
+        assertThat(subscription).isNotNull();
+        assertThat(subscription.id()).isNull();
+        assertThat(subscription.referrer()).isNull();
+        assertThat(subscription.event()).isEqualTo(event);
+        assertThat(subscription.user()).isEqualTo(user);
+    }
+
+    @Test
+    public void shouldSubscribeUserWithReferrer() {
+        final var event = EventBuilder.builder().build().newEvent();
+        final var user = UserFactory.fromRaw(1L, "john doe", "john@doe.com");
+        final var referrer = UserFactory.fromRaw(2L, "barry allen", "barry@allen.com");
+
+        final var subscription = event.subscribe(user, referrer);
+
+        assertThat(subscription).isNotNull();
+        assertThat(subscription.id()).isNull();
+        assertThat(subscription.referrer()).isEqualTo(referrer);
+        assertThat(subscription.event()).isEqualTo(event);
+        assertThat(subscription.user()).isEqualTo(user);
     }
 
     @Test

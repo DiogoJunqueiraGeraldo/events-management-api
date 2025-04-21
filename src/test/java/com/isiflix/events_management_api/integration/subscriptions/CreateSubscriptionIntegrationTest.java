@@ -12,6 +12,7 @@ import com.isiflix.events_management_api.infra.database.users.JPAUserRepository;
 import com.isiflix.events_management_api.infra.database.users.UserEntity;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
@@ -54,6 +55,9 @@ public class CreateSubscriptionIntegrationTest {
 
     @Autowired
     JPAUserRepository jpaUserRepository;
+
+    @Value("app.designation-base-url")
+    String designationBaseUrl;
 
     private static boolean eventLoaded = false;
     @BeforeEach
@@ -197,8 +201,8 @@ public class CreateSubscriptionIntegrationTest {
         final var user = jpaUserRepository.findByEmail("john@doe.com");
         assertThat(user).isPresent();
 
-        final var expectedDesignation = "/%s/%d".formatted(EXISTING_EVENT, user.get().getId());
-        assertThat(response.designation()).endsWith(expectedDesignation);
+        final var expectedDesignation = "%s/subscriptions/%s/%d".formatted(designationBaseUrl, EXISTING_EVENT, user.get().getId());
+        assertThat(response.designation()).isEqualTo(expectedDesignation);
     }
 
     @Test

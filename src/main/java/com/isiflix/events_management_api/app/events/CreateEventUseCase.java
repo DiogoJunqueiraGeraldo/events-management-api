@@ -7,7 +7,6 @@ import com.isiflix.events_management_api.domain.errors.ViolationCode;
 import com.isiflix.events_management_api.domain.events.Event;
 import com.isiflix.events_management_api.domain.events.EventFactory;
 import com.isiflix.events_management_api.domain.events.EventRepository;
-import com.isiflix.events_management_api.domain.events.vos.EventPrettyName;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -43,11 +42,11 @@ public class CreateEventUseCase {
         }
     }
 
-    private void throwPrettyNameAlreadyExists(EventPrettyName eventPrettyName) {
+    private void throwPrettyNameAlreadyExists(String eventPrettyName) {
         throw new BusinessRuleViolationException(
                 ViolationCode.CONFLICT_PRETTY_NAME_ALREADY_EXISTS,
                 "Can't create event because event's pretty name already exists",
-                Map.of("prettyName", eventPrettyName.toString())
+                Map.of("prettyName", eventPrettyName)
         );
     }
 

@@ -133,5 +133,5 @@ public class Event {
     }
 
     public Long getId() { return this.id; }
-    public EventPrettyName getPrettyName() { return this.eventPrettyName; }
+    public String getPrettyName() { return this.eventPrettyName.toString(); }
 }

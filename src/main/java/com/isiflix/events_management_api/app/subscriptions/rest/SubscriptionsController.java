@@ -17,6 +17,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,19 +31,22 @@ public class SubscriptionsController {
     private final FindUserUseCase findUserUseCase;
     private final UserReferralRankUseCase userReferralRankUseCase;
 
+    private final String designationBaseUrl;
+
     @Autowired
     public SubscriptionsController(CreateSubscriptionUseCase createSubscriptionUseCase,
                                    ReferralPodiumUseCase referralPodiumUseCase,
                                    FindEventUseCase findEventUseCase,
                                    FindUserUseCase findUserUseCase,
-                                   UserReferralRankUseCase userReferralRankUseCase
-
+                                   UserReferralRankUseCase userReferralRankUseCase,
+                                   @Value("app.designation-base-url") String designationBaseUrl
     ) {
         this.createSubscriptionUseCase = createSubscriptionUseCase;
         this.referralPodiumUseCase = referralPodiumUseCase;
         this.findEventUseCase = findEventUseCase;
         this.findUserUseCase = findUserUseCase;
         this.userReferralRankUseCase = userReferralRankUseCase;
+        this.designationBaseUrl = designationBaseUrl;
     }
 
     @PostMapping({"/{prettyName}", "/{prettyName}/{referrerId}"})
@@ -54,7 +58,7 @@ public class SubscriptionsController {
     ) {
         final var createSubscriptionDTO = new CreateSubscriptionDTO(prettyName, req.userName(), req.email());
         SubscriptionDTO subscriptionDTO = createSubscriptionUseCase.createNewSubscription(createSubscriptionDTO, referrerId);
-        return new CreateSubscriptionResponse(subscriptionDTO.id(), subscriptionDTO.designation());
+        return CreateSubscriptionResponse.fromDTO(subscriptionDTO, designationBaseUrl);
     }
 
     @GetMapping("/{prettyName}/ranking")
