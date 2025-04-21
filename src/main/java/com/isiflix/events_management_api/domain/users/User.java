@@ -12,11 +12,11 @@ public class User {
         this.name = name;
         this.email = email;
 
-        if(name == null || name.isEmpty()) {
+        if(name == null || name.isBlank()) {
             throw new IllegalArgumentException("User 'name' cannot be null or empty");
         }
 
-        if(email == null || email.isEmpty()) {
+        if(email == null || email.isBlank()) {
             throw new IllegalArgumentException("User 'email' cannot be null or empty");
         }
     }
@@ -43,11 +43,7 @@ public class User {
         if (o == null || getClass() != o.getClass()) return false;
 
         User user = (User) o;
-
-        if (id != null && !id.equals(user.id)) return false;
-
-        // Both are null, can't affirm that they're equal
-        if (email == null && user.email == null) return false;
-        return email != null && email.equals(user.email);
+        if (!id.equals(user.id)) return false;
+        return email.equals(user.email);
     }
 }

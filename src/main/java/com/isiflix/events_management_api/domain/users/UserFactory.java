@@ -4,7 +4,7 @@ import com.isiflix.events_management_api.app.users.dtos.CreateUserDTO;
 import com.isiflix.events_management_api.app.users.dtos.UserDTO;
 
 public class UserFactory {
-    public static User of(CreateUserDTO createUserDTO) {
+    public static User create(CreateUserDTO createUserDTO) {
         return new User(null, createUserDTO.name(), createUserDTO.email());
     }
 

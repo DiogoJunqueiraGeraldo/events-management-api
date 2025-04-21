@@ -19,7 +19,7 @@ public class CreateUserUseCase {
     }
 
     public UserDTO createUser(CreateUserDTO dto) {
-        final var user = UserFactory.of(dto);
+        final var user = UserFactory.create(dto);
         return userRepository.saveIfNotExists(user).toDTO();
     }
 }
