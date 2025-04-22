@@ -6,6 +6,7 @@ import com.isiflix.events_management_api.domain.errors.ViolationCode;
 import com.isiflix.events_management_api.domain.users.User;
 
 import java.util.Map;
+import java.util.Optional;
 
 public record Subscription(Long id, Event event, User user, User referrer) {
     public Subscription(Long id, Event event, User user, User referrer) {
@@ -32,6 +33,13 @@ public record Subscription(Long id, Event event, User user, User referrer) {
     }
 
     public SubscriptionDTO toDTO() {
-        return new SubscriptionDTO(id, event.toDTO(), user.toDTO());
+        return new SubscriptionDTO(
+                id,
+                event.toDTO(),
+                user.toDTO(),
+                Optional.ofNullable(referrer)
+                        .map(User::toDTO)
+                        .orElse(null)
+        );
     }
 }

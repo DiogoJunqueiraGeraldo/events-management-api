@@ -13,8 +13,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -39,7 +38,7 @@ public class UserRepositoryAdapterTest {
     @Test
     public void shouldFlushForCheckConstraintsOnSave() {
         when(jpaUserRepository.saveAndFlush(any(UserEntity.class))).thenReturn(UserMapper.toEntity(user));
-        userRepositoryAdapter.saveIfNotExists(user);
+        userRepositoryAdapter.persistIdempotently(user);
         verify(jpaUserRepository, times(1)).saveAndFlush(any(UserEntity.class));
     }
 
@@ -50,7 +49,7 @@ public class UserRepositoryAdapterTest {
         when(jpaUserRepository.saveAndFlush(any(UserEntity.class))).thenThrow(ex);
         when(jpaUserRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(UserMapper.toEntity(user)));
 
-        final var foundUser = userRepositoryAdapter.saveIfNotExists(user);
+        final var foundUser = userRepositoryAdapter.persistIdempotently(user);
 
         verify(jpaUserRepository, times(1)).saveAndFlush(any(UserEntity.class));
         verify(jpaUserRepository, times(1)).findByEmail(user.getEmail());
@@ -67,7 +66,7 @@ public class UserRepositoryAdapterTest {
 
         when(jpaUserRepository.saveAndFlush(any(UserEntity.class))).thenThrow(ex);
 
-        assertThatThrownBy(() -> userRepositoryAdapter.saveIfNotExists(user))
+        assertThatThrownBy(() -> userRepositoryAdapter.persistIdempotently(user))
                 .isInstanceOf(DataIntegrityViolationException.class)
                 .hasMessage("Foo");
     }
@@ -79,7 +78,7 @@ public class UserRepositoryAdapterTest {
         when(jpaUserRepository.saveAndFlush(any(UserEntity.class))).thenThrow(ex);
         when(jpaUserRepository.findByEmail(user.getEmail())).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> userRepositoryAdapter.saveIfNotExists(user))
+        assertThatThrownBy(() -> userRepositoryAdapter.persistIdempotently(user))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("Can't find inserted user entity");
     }

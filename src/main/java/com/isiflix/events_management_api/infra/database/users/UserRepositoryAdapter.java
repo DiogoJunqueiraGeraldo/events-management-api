@@ -34,7 +34,7 @@ public class UserRepositoryAdapter implements UserRepository {
     }
 
     @Override
-    public User saveIfNotExists(User user) {
+    public User persistIdempotently(User user) {
         UserEntity entity = UserMapper.toEntity(user);
 
         try {

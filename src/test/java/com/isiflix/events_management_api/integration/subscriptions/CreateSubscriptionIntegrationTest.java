@@ -168,8 +168,7 @@ public class CreateSubscriptionIntegrationTest {
                 .getContentAsString();
 
         final var error = objectMapper.readValue(responseBody, StandardErrorResponse.class);
-        Assertions.assertEquals(ViolationCode.CANT_SUBSCRIBE_TO_NON_EXISTING_EVENT.toString(), error.code());
-        Assertions.assertTrue(error.message().contains(NON_EXISTING_EVENT));
+        Assertions.assertEquals(ViolationCode.EVENT_NOT_FOUND_BY_PRETTY_NAME.toString(), error.code());
     }
 
 

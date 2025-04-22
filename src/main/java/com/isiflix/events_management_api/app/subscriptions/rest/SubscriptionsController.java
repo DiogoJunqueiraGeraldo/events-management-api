@@ -46,8 +46,8 @@ public class SubscriptionsController {
             @PathVariable(required = false) Long referrerId,
             @Valid @RequestBody CreateSubscriptionRequest req
     ) {
-        final var createSubscriptionDTO = new CreateSubscriptionDTO(prettyName, req.userName(), req.email());
-        SubscriptionDTO subscriptionDTO = createSubscriptionUseCase.createNewSubscription(createSubscriptionDTO, referrerId);
+        final var createSubscriptionDTO = new CreateSubscriptionDTO(prettyName, req.userName(), req.email(), referrerId);
+        SubscriptionDTO subscriptionDTO = createSubscriptionUseCase.createNewSubscription(createSubscriptionDTO);
         return CreateSubscriptionResponse.fromDTO(subscriptionDTO, designationBaseUrl);
     }
 

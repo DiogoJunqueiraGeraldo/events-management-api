@@ -1,8 +1,11 @@
 package com.isiflix.events_management_api.infra.database.events;
 
+import com.isiflix.events_management_api.domain.errors.BusinessRuleViolationException;
+import com.isiflix.events_management_api.domain.errors.ViolationCode;
 import com.isiflix.events_management_api.domain.events.Event;
 import com.isiflix.events_management_api.domain.events.EventFactory;
 import com.isiflix.events_management_api.domain.events.vos.EventPeriodTest;
+import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
@@ -12,6 +15,7 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -21,7 +25,7 @@ import java.time.LocalDateTime;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.IntStream;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -29,6 +33,9 @@ import static org.mockito.Mockito.*;
 public class EventRepositoryAdapterTest {
     @Mock
     JPAEventRepository jpaEventRepository;
+
+    @Mock
+    ConstraintViolationException constraintViolationException;
 
     @InjectMocks
     EventRepositoryAdapter eventRepositoryAdapter;
@@ -68,6 +75,53 @@ public class EventRepositoryAdapterTest {
         when(jpaEventRepository.saveAndFlush(any(EventEntity.class))).thenReturn(EventMapper.toEntity(event));
         eventRepositoryAdapter.saveAndCheckConstraints(event);
         verify(jpaEventRepository, times(1)).saveAndFlush(any(EventEntity.class));
+    }
+
+    @Test
+    public void shouldThrowBusinessExceptionWhenPrettyNameConstraintViolationIsThrown() {
+        when(constraintViolationException.getConstraintName()).thenReturn(EventRepositoryAdapter.PRETTY_NAME_UNIQUE_CONSTRAINT);
+        final var dataIntegrityException = new DataIntegrityViolationException("Foo", constraintViolationException);
+        when(jpaEventRepository.saveAndFlush(any(EventEntity.class))).thenThrow(dataIntegrityException);
+
+        final var exception = catchThrowable(() -> eventRepositoryAdapter.saveAndCheckConstraints(event));
+
+        assertThat(exception)
+                .isInstanceOf(BusinessRuleViolationException.class)
+                .hasMessage( "Can't create event because event's pretty name already exists");
+
+        final var businessRuleViolationException = (BusinessRuleViolationException) exception;
+        assertThat(businessRuleViolationException.getViolationCode()).isEqualTo(ViolationCode.CONFLICT_PRETTY_NAME_ALREADY_EXISTS);
+    }
+
+    @Test
+    public void shouldThrowExceptionIfIsNotPrettyNameConstraintViolation() {
+        when(constraintViolationException.getConstraintName()).thenReturn("another-constraint");
+        final var dataIntegrityException = new DataIntegrityViolationException("Foo", constraintViolationException);
+        when(jpaEventRepository.saveAndFlush(any(EventEntity.class))).thenThrow(dataIntegrityException);
+
+        assertThatThrownBy(() -> eventRepositoryAdapter.saveAndCheckConstraints(event))
+                .isInstanceOf(DataIntegrityViolationException.class)
+                .hasMessage( "Foo");
+    }
+
+    @Test
+    public void shouldThrowExceptionIfIsNotCausedByConstraintViolation() {
+        final var dataIntegrityException = new DataIntegrityViolationException("Foo", new NullPointerException());
+        when(jpaEventRepository.saveAndFlush(any(EventEntity.class))).thenThrow(dataIntegrityException);
+
+        assertThatThrownBy(() -> eventRepositoryAdapter.saveAndCheckConstraints(event))
+                .isInstanceOf(DataIntegrityViolationException.class)
+                .hasMessage( "Foo");
+    }
+
+    @Test
+    public void shouldThrowExceptionIfIsNotDataIntegrityViolation() {
+        final var nullPointerException = new NullPointerException("Bar");
+        when(jpaEventRepository.saveAndFlush(any(EventEntity.class))).thenThrow(nullPointerException);
+
+        assertThatThrownBy(() -> eventRepositoryAdapter.saveAndCheckConstraints(event))
+                .isInstanceOf(NullPointerException.class)
+                .hasMessage( "Bar");
     }
 
     @RepeatedTest(5)
