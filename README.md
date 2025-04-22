@@ -4,8 +4,6 @@ An academic project built to explore **Test-Driven Development (TDD)** in Java u
 It simulates a minimal event management system, while showcasing patterns like **domain-driven modeling**, **value
 objects**, and **integration testing** — without slipping into tutorial boilerplate.
 
-> This repo isn't production-ready — but it's aiming higher than "just works".
-
 ## ✨ Features
 
 - ✅ Create and manage events
@@ -18,10 +16,6 @@ objects**, and **integration testing** — without slipping into tutorial boiler
 
 **This project does not handle timezones.** All date and time operations assume the local system timezone without
 adjustments.
-
-## ✅ MVP Infra Checklist
-
-> Production readiness starts here. If you're missing items below, you're not running in prod — you're cosplaying.
 
 ### Logging & Observability
 - [x] Structured logging (JSON format)
@@ -57,7 +51,6 @@ adjustments.
 **Optional but appreciated:**
 - [x] Docker Compose or Helm chart for local/test deploy
 
-
 ## ⚙️ Requirements
 
 - Java 21+
@@ -92,6 +85,4 @@ To execute all tests:
 ```bash
   mvn test
 ```
-
-> Yes, we test our code. It's kind of the point here.
 

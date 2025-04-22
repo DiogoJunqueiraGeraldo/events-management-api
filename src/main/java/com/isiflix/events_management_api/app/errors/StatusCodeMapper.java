@@ -13,7 +13,6 @@ public class StatusCodeMapper {
      * The goal is to **fail fast** during development whenever a new violation code is introduced,
      * ensuring developers make a conscious decision about the appropriate HTTP status for each case.
      * <p>
-     * TL;DR: You added a new {@code ViolationCode}? You better decide its HTTP status, or this won't compile.
      *
      * @param violationCode the domain-level violation code
      * @return the HTTP status code to be returned by the application layer
@@ -24,7 +23,6 @@ public class StatusCodeMapper {
                  CONFLICT_USER_ALREADY_SUBSCRIBED_TO_EVENT -> HttpStatus.CONFLICT;
             case EVENT_NOT_FOUND_BY_PRETTY_NAME,
                  USER_NOT_FOUND_BY_ID -> HttpStatus.NOT_FOUND;
-            // don't you dare add a default clause
         };
 
         return statusCode.value();

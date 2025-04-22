@@ -15,16 +15,6 @@ public class Event {
     private BigDecimal price;
     private EventPeriod period;
 
-    /**
-     * New Instance Constructor
-     * <p>
-     * It should be used to create a new event instance, when it doesn't exist on the storage yet
-     * </p>
-     * @param name event name, it will be used to generate the pretty name
-     * @param location event location, where the event will be placed
-     * @param price event price, it can be for free, but don't try to get smart about it
-     * @param period event period, it should be consistence, otherwise it won't instantiate
-     */
     protected Event(String name, String location, BigDecimal price, EventPeriod period) {
         setName(name);
         setLocation(location);
@@ -34,19 +24,6 @@ public class Event {
         this.eventPrettyName = EventPrettyName.of(name);
     }
 
-    /**
-     * Deserialization Instance Constructor
-     * <p>
-     * It should be used to create an existing instance, when it's been validated already
-     * </p>
-     *
-     * @param id event unique identifier
-     * @param name event name, stored on the database
-     * @param eventPrettyName event prettyName, stored on the database
-     * @param location event location, stored on the database
-     * @param price event price, stored on the database
-     * @param period event period, stored on the database
-     */
     protected Event(Long id, String name, EventPrettyName eventPrettyName, String location, BigDecimal price, EventPeriod period) {
         setId(id);
         setName(name);
@@ -56,14 +33,6 @@ public class Event {
         setPeriod(period);
     }
 
-
-    /**
-     * Serialization DTO Factory
-     * <p>
-     * The Event entity it's inheriting the responsibility of creating the dto, to avoid exposing internal fields
-     * </p>
-     * @return event data transfer object, specialized for serialization
-     */
     public EventDTO toDTO() {
         return new EventDTO(
                 this.id,

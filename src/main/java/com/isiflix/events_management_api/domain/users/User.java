@@ -7,7 +7,7 @@ public class User {
     private final String name;
     private final String email;
 
-    User(Long id, String name, String email) {
+    protected User(Long id, String name, String email) {
         this.id = id;
         this.name = name;
         this.email = email;
