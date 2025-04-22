@@ -55,8 +55,6 @@ adjustments.
 ---
 
 **Optional but appreciated:**
-- [ ] CI pipeline (GitHub Actions, GitLab CI, etc.)
-- [ ] Static code analysis (SonarQube, PMD, etc.)
 - [x] Docker Compose or Helm chart for local/test deploy
 
 
