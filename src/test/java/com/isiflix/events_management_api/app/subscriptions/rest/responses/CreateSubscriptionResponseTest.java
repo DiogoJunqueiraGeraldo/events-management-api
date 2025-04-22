@@ -4,7 +4,6 @@ import com.isiflix.events_management_api.app.events.dtos.EventDTO;
 import com.isiflix.events_management_api.app.subscriptions.dtos.SubscriptionDTO;
 import com.isiflix.events_management_api.app.users.dtos.UserDTO;
 import com.isiflix.events_management_api.domain.events.vos.EventPeriodTest;
-import org.h2.engine.User;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;

@@ -2,7 +2,6 @@ package com.isiflix.events_management_api.app.users;
 
 import com.isiflix.events_management_api.domain.errors.BusinessRuleViolationException;
 import com.isiflix.events_management_api.domain.errors.ViolationCode;
-import com.isiflix.events_management_api.domain.events.vos.EventPrettyName;
 import com.isiflix.events_management_api.domain.users.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,7 +13,6 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 

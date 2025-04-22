@@ -5,7 +5,6 @@ import com.isiflix.events_management_api.app.subscriptions.dtos.CreateSubscripti
 import com.isiflix.events_management_api.app.users.CreateUserUseCase;
 import com.isiflix.events_management_api.app.users.FindUserUseCase;
 import com.isiflix.events_management_api.app.users.dtos.CreateUserDTO;
-import com.isiflix.events_management_api.app.users.dtos.UserDTO;
 import com.isiflix.events_management_api.domain.errors.BusinessRuleViolationException;
 import com.isiflix.events_management_api.domain.errors.ViolationCode;
 import com.isiflix.events_management_api.domain.events.Event;
@@ -23,7 +22,6 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
