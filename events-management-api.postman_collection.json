@@ -194,7 +194,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host}}/subscriptions/{{prettyName}}/ranking/52",
+							"raw": "{{host}}/subscriptions/{{prettyName}}/ranking/{{userId}}",
 							"host": [
 								"{{host}}"
 							],
@@ -202,7 +202,48 @@
 								"subscriptions",
 								"{{prettyName}}",
 								"ranking",
-								"52"
+								"{{userId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Actuator",
+			"item": [
+				{
+					"name": "Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/actuator/health",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"actuator",
+								"health"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Metrics",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/actuator/metrics",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"actuator",
+								"metrics"
 							]
 						}
 					},

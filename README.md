@@ -25,15 +25,12 @@ adjustments.
 
 ### Logging & Observability
 - [x] Structured logging (JSON format)
-- [ ] MDC (`requestId`, `userId`, `correlationId`)
 - [x] Exception handling with stacktrace logged
 - [x] Centralized error format (`code`, `message`, `issues`, etc.)
 
 ### Metrics & Tracing
-- [ ] Micrometer metrics exported (e.g., Prometheus)
-- [ ] Distributed tracing (OpenTelemetry, Sleuth)
-- [ ] Health check endpoint (`/actuator/health`)
-- [ ] Metrics endpoint (`/actuator/metrics`)
+- [x] Health check endpoint (`/actuator/health`)
+- [x] Metrics endpoint (`/actuator/metrics`)
 
 ### Reliability Patterns
 - [x] Timeout for all external calls (HTTP, DB, etc.)
@@ -45,14 +42,11 @@ adjustments.
 - [x] Secrets via environment variables or secret manager
 
 ### Security Basics
-- [ ] Authentication implemented (JWT, OAuth2, etc.)
 - [x] No sensitive info exposed in error responses
 
 ### Infrastructure & Packaging
 - [x] Dockerfile using lightweight base image
 - [x] Build is reproducible (e.g., via Maven wrapper)
-- [ ] Readiness and liveness probes for orchestration
-- [ ] Container shuts down gracefully
 
 ### Data & Persistence
 - [x] Schema migrations via Flyway or Liquibase
