@@ -1,7 +1,7 @@
 package com.isiflix.events_management_api.app.subscriptions;
 
-import com.isiflix.events_management_api.app.events.dtos.EventDTO;
-import com.isiflix.events_management_api.app.users.dtos.UserDTO;
+import com.isiflix.events_management_api.app.events.FindEventUseCase;
+import com.isiflix.events_management_api.app.users.FindUserUseCase;
 import com.isiflix.events_management_api.app.subscriptions.dtos.UserReferralRankDTO;
 import com.isiflix.events_management_api.domain.events.EventFactory;
 import com.isiflix.events_management_api.domain.events.SubscriptionRepository;
@@ -12,16 +12,28 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserReferralRankUseCase {
     private final SubscriptionRepository subscriptionRepository;
+    private final FindEventUseCase findEventUseCase;
+    private final FindUserUseCase findUserUseCase;
 
     @Autowired
-    public UserReferralRankUseCase(SubscriptionRepository subscriptionRepository) {
+    public UserReferralRankUseCase(SubscriptionRepository subscriptionRepository,
+                                   FindEventUseCase findEventUseCase,
+                                   FindUserUseCase findUserUseCase
+    ) {
         this.subscriptionRepository = subscriptionRepository;
+        this.findEventUseCase = findEventUseCase;
+        this.findUserUseCase = findUserUseCase;
     }
 
-    public UserReferralRankDTO getUserReferralRank(EventDTO eventDTO, UserDTO userDTO) {
-        final var event = EventFactory.of(eventDTO);
-        final var user = UserFactory.of(userDTO);
-        final var rankVo = subscriptionRepository.calculateRankForUser(event, user);
+    public UserReferralRankDTO getUserReferralRank(String prettyName, Long userId) {
+        final var eventDTO = findEventUseCase.findEventByPrettyNameOrThrow(prettyName);
+        final var userDTO = findUserUseCase.findUserByIDOrThrow(userId);
+
+        final var rankVo = subscriptionRepository.calculateRankForUser(
+                EventFactory.of(eventDTO),
+                UserFactory.of(userDTO)
+        );
+
         return new UserReferralRankDTO(rankVo.position(), rankVo.referralsCounter(), userDTO);
     }
 }

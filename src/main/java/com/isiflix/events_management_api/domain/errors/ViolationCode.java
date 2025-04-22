@@ -7,7 +7,9 @@ public enum ViolationCode {
     CONFLICT_PRETTY_NAME_ALREADY_EXISTS("conflict-pretty-name-already-exists"),
     CANT_SUBSCRIBE_TO_NON_EXISTING_EVENT("cant-subscribe-to-non-existing-event"),
     CONFLICT_USER_ALREADY_SUBSCRIBED_TO_EVENT("conflict-user-already-subscribed-to-event"),
-    CONFLICT_CANT_REFER_ITSELF("conflict-can-refer-itself"),;
+    CONFLICT_CANT_REFER_ITSELF("conflict-can-refer-itself"),
+    EVENT_NOT_FOUND_BY_PRETTY_NAME("event-not-found-by-pretty-name"),
+    USER_NOT_FOUND_BY_ID("user-not-found-by-id"),;
 
     private final String code;
     ViolationCode(String code) {
